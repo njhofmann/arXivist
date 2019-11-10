@@ -31,7 +31,7 @@ def main():
             user_mode = input(f"available modes are {', '.join([mode.value for mode in UserOptions])}\n")
             parse_mode(user_mode)
         except Exception as e:
-            raise e
+            print(e)
 
 
 if __name__ == '__main__':
