@@ -80,16 +80,15 @@ class DatabaseQuery(u.BaseQuery):
             yield []
 
 
-def get_suggestions(cursor) -> List[Tuple[str]]:
+def get_suggestions(cursor) -> List[str]:
     query = sql.SQL('WITH {} AS (SELECT DISTINCT({}) {} FROM {}) '
-                    'SELECT {} {} FROM {} {}, {}, {} WHERE {} NOT IN {} GROUP BY {} ORDER BY COUNT(*) ').format(
+                    'SELECT {} FROM {} {}, {} {} WHERE {} != {} GROUP BY {} ORDER BY COUNT(*) ').format(
         sql.Identifier('added_ids'), sql.Identifier('child_id'), sql.Identifier('id'), sql.Identifier('citation_graph'),
-        sql.Identifier('p', 'parent_id'), sql.Identifier('pi'), sql.Identifier('citation_graph'), sql.Identifier('p'),
-        sql.Identifier('added_ids'), sql.Identifier('a'), sql.Identifier('pi'), sql.Identifier('a', 'id'),
-        sql.Identifier('pi'))
-    print()
+        sql.Identifier('p', 'parent_id'), sql.Identifier('citation_graph'), sql.Identifier('p'),
+        sql.Identifier('added_ids'), sql.Identifier('a'), sql.Identifier('p', 'parent_id'), sql.Identifier('a', 'id'),
+        sql.Identifier('p', 'parent_id'))
     cursor.execute(query)
-    return cursor.fetchall()
+    return [result[0] for result in cursor.fetchall()]
 
 if __name__ == '__main__':
     get_suggestions()
