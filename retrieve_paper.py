@@ -12,15 +12,12 @@ class SearchResult:
     title: str
     id: str  # arxiv id
     abstract: str
+    publish: str
     authors: List[str]  # authors of paper in terms of ordership
     pdf_link: str
 
     def __str__(self):
-        return f"""
-        Title: {self.title}\n
-        Authors: {','.join(self.authors)}\n
-        Abstract: {self.abstract}
-        """
+        return f"Title: {self.title}\nAuthors: {','.join(self.authors)}\nAbstract: {self.abstract}"
 
 
 class SearchQuery:
@@ -124,6 +121,11 @@ class SearchQuery:
 
             abstract = self.get_atom_child_text(entry, 'summary')
 
+            date = self.get_atom_child_text(entry, 'published')
+            updated_dates = self.get_atom_children(entry, 'updated')
+            if updated_dates:
+                date = updated_dates[-1].text
+
             pdf_link = None
             for link in self.get_atom_children(entry, 'link'):
                 if link.get('title'):
@@ -132,7 +134,8 @@ class SearchQuery:
 
             authors = [self.get_atom_child(author, 'name').text for author in self.get_atom_children(entry, 'author')]
 
-            parsed_entries.append(SearchResult(title=title, id=arxiv_id, abstract=abstract, authors=authors, pdf_link=pdf_link))
+            parsed_entries.append(SearchResult(title=title, id=arxiv_id, abstract=abstract, authors=authors,
+                                               pdf_link=pdf_link, publish=date))
         return parsed_entries
 
     def parse_error(self, error_msg: str):

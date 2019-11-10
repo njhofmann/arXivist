@@ -2,11 +2,15 @@ import requests as r
 from retrieve_paper import SearchResult
 from typing import List
 import json as j
+import re
 
+ARXIV_VERSION = re.compile('v[0-9]')
 BASE_URL = 'http://api.semanticscholar.org/v1/paper/arXiv:'
 
 
 def get_arxiv_url(result: str) -> str:
+    if ARXIV_VERSION.match(result, len(result) - 2):
+        result = result[:-2]
     return BASE_URL + result
 
 

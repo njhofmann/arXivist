@@ -1,8 +1,11 @@
-from typing import List, Any, Tuple, Map
+from typing import List, Any, Tuple, Dict, Union, Set
 import retrieve_paper as rp
 import enum as e
 import sys
-
+import retrieve_biblio as rb
+import psycopg2 as psy
+import db_entries as dbe
+import retrieve_pdf as rpdf
 
 BAD_CHARS = (' ')
 
@@ -15,11 +18,54 @@ class UserSearchResponses(e.Enum):
     QUIT = 'quit'
 
     def __eq__(self, other: Any) -> bool:
-        if isinstance(UserSearchResponses, other):
-            return self == other
-        elif isinstance(str, other):
+        if isinstance(other, UserSearchResponses):
+            return self is other
+        elif isinstance(other, str):
             return other == self.value
         return False
+
+    @staticmethod
+    def is_valid_response(response: str) -> bool:
+        return any([response == search_response for search_response in UserSearchResponses])
+
+
+class SaveQuery:
+
+    def __init__(self):
+        self.selected_ids: Set[int] = set()
+        self.valid_ids_to_info: Dict[int, rp.SearchResult] = {}
+
+    def add_valid_id(self, result_id: int, result: rp.SearchQuery) -> None:
+        if result_id in self.valid_ids_to_info:
+            raise ValueError(f'id {result_id} already added to list of valid ids')
+        self.valid_ids_to_info[result_id] = result
+
+    def get_result(self, result_id: int) -> rp.SearchResult:
+        if self.is_valid_id(result_id):
+            return self.valid_ids_to_info[result_id]
+        raise ValueError(f'id {result_id} is not a valid id')
+
+    def select_id(self, param: int) -> None:
+        if not self.is_valid_id(param):
+            raise ValueError(f'{param} not in list of valid ids')
+        self.selected_ids.add(param)
+
+    def is_valid_id(self, result_id: int) -> bool:
+        return result_id in self.valid_ids_to_info
+
+    def __str__(self):
+        if self.selected_ids:
+            return f"save query: {', '.join([str(entry) for entry in self.selected_ids])}"
+        return 'nothing in save query'
+
+    def submit(self) -> None:
+        with psy.connect(dbname='arxiv') as conn:
+            with conn.cursor() as cursor:
+                for result_id in self.selected_ids:
+                    result = self.get_result(result_id)
+                    pdf_path = rpdf.fetch_and_save_pdf(result.pdf_link)
+                    references = rb.retrieve_references(result)
+                    dbe.insert_search_query(cursor, result, references, pdf_path)
 
 
 def is_list_of_n_ints(to_parse: List[str], n: int = -1) -> List[int]:
@@ -33,13 +79,20 @@ def is_list_of_n_ints(to_parse: List[str], n: int = -1) -> List[int]:
     return to_parse
 
 
-def validate_user_result_response(response: List[str]) -> Tuple[UserSearchResponses, List[int]]:
-    if not response or response[0] not in UserSearchResponses:
-        raise ValueError(f"response must be one of {','.join([_ for _ in UserSearchResponses])}")
+def validate_user_result_response(response: List[str], save_query: SaveQuery) -> Tuple[UserSearchResponses,
+                                                                                       Union[int, List[int]]]:
+    if not response:
+        raise ValueError(f"not provided a response, must be one of {','.join([str(_) for _ in UserSearchResponses])}")
 
     cmd, params = response[0], response[1:]
+    if not UserSearchResponses.is_valid_response(cmd):
+        raise ValueError(f"invalid response {cmd}, must be one of {','.join([str(_) for _ in UserSearchResponses])}")
+
     if cmd == UserSearchResponses.MORE:
-        return UserSearchResponses.MORE, is_list_of_n_ints(params, 1)
+        selected_id = is_list_of_n_ints(params, 1)[0]
+        if not save_query.is_valid_id(selected_id):
+            raise ValueError(f'selected id {selected_id} is not a valid id')
+        return UserSearchResponses.MORE, selected_id
     elif cmd == UserSearchResponses.ADD:
         return UserSearchResponses.ADD, is_list_of_n_ints(params)
     elif cmd == UserSearchResponses.CONT:
@@ -48,31 +101,6 @@ def validate_user_result_response(response: List[str]) -> Tuple[UserSearchRespon
         return UserSearchResponses.QUIT, is_list_of_n_ints(params, 0)
     else:
         return UserSearchResponses.VIEW, is_list_of_n_ints(params, 0)
-
-
-class SaveQuery:
-
-    def __init__(self):
-        self.selected_ids: List[id] = []
-        self.valid_ids_to_info: Map[int, rp.SearchQuery] = {}
-
-    def add_valid_id(self, result_id: int, result: rp.SearchQuery) -> None:
-        if result_id in self.valid_ids_to_info:
-            raise ValueError(f'id {result_id} already added to list of valid ids')
-        self.valid_ids_to_info[result_id] = result
-
-    def add_id(self, param: int) -> None:
-        if param not in self.valid_ids_to_info:
-            raise ValueError(f'{param} not in list of valid ids')
-        self.selected_ids.append(param)
-
-    def __str__(self):
-        if self.selected_ids:
-            return f"save query: {', '.join(self.selected_ids)}"
-        return 'nothing in save query'
-
-    def submit(self) -> None:
-        pass
 
 
 def delete_last_line():
@@ -97,41 +125,42 @@ def main():
 
             save_query = SaveQuery()
             for responses in search_query.retrieve_search_results():
-                for response in responses:
-                    id = response[0]
-                    title = response[1]
-                    save_query.add_valid_id(id, response[1])
-                    print(id, title)
-                results_response = input("""
-                options: 
-                  - 'more id' to view more info\n
-                  - 'cont' to view more results\n
-                  - 'add ids' to add results to save query\n
-                  - 'view' to view current save query
-                  - 'quit' to terminate responses and submit save query\n
-                """)
+                for result_id, response in responses:
+                    title = response.title
+                    save_query.add_valid_id(result_id, response)
+                    print(result_id, title)
 
-                cmd, params = validate_user_result_response(results_response)
+                print("\noptions:\n"
+                      "- 'more id' to view more info\n"
+                      "- 'cont' to view more results\n"
+                      "- 'add ids' to add results to save query\n"
+                      "- 'view' to view current save query\n"
+                      "- 'quit' to terminate responses and submit save query")
 
-                if cmd == UserSearchResponses.MORE:
-                    print()
-                elif cmd == UserSearchResponses.ADD:
-                    for param in params:
-                        save_query.add_id(param)
-                elif cmd == UserSearchResponses.CONT:
-                    continue
-                elif cmd == UserSearchResponses.QUIT:
-                    save_query.submit()
-                    break
-                elif cmd == UserSearchResponses.VIEW:
-                    print(save_query)
+                wait_on_user = True
+                while wait_on_user:
+                    results_response = input('waiting...\n')
+                    results_response = [result for result in results_response.split(' ') if result]
+                    cmd, params = validate_user_result_response(results_response, save_query)
 
+                    if cmd == UserSearchResponses.MORE:
+                        print(save_query.get_result(params))
+                    elif cmd == UserSearchResponses.ADD:
+                        for param in params:
+                            save_query.select_id(param)
+                    elif cmd == UserSearchResponses.CONT:
+                        wait_on_user = False
+                    elif cmd == UserSearchResponses.QUIT:
+                        save_query.submit()
+                        break
+                    elif cmd == UserSearchResponses.VIEW:
+                        print(save_query)
 
                 for _ in responses:  # TODO fix clearing
                     delete_last_line()
 
         except Exception as e:
-            print(str(e))
+            raise e
 
 
 if __name__ == '__main__':
