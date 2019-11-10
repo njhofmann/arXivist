@@ -2,7 +2,7 @@ import requests as r
 import pathlib as pl
 import uuid
 
-FOLDER_PATH = pl.Path(__file__).parent.joinpath('pdfs')
+FOLDER_PATH = pl.Path(__file__).parent.parent.joinpath('pdfs')
 
 
 def fetch_and_save_pdf(pdf_url: str) -> pl.Path:
