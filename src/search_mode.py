@@ -1,7 +1,7 @@
 from typing import List, Tuple, Dict, Union, Set
 import utility as u
 import psycopg2 as psy
-from src import pdf_utils as rpdf, retrieve_biblio as rb, db_insert as dbe, retrieve_paper as rp
+import pdf_utils as rpdf, retrieve_biblio as rb, db_insert as dbe, retrieve_paper as rp
 
 
 class UserSearchResponses(u.EqualEnum):
@@ -46,7 +46,7 @@ class SaveQuery:
             with conn.cursor() as cursor:
                 for result_id in self.selected_ids:
                     result = self.get_result(result_id)
-                    pdf_path = rpdf.fetch_and_save_pdf(result.pdf_url)
+                    pdf_path = rpdf.fetch_and_save_pdf(result)
                     references = rb.retrieve_references(result)
                     dbe.insert_search_query(cursor, result, references, pdf_path)
 
@@ -120,3 +120,5 @@ def search_mode():
                 break
             elif cmd == UserSearchResponses.VIEW:
                 print(save_query)
+
+        break

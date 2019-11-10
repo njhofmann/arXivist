@@ -2,12 +2,17 @@ import requests as r
 import pathlib as pl
 import uuid
 import subprocess as sbp
+import utility as u
+import search_mode as sm
+import retrieve_paper as rp
 
 FOLDER_PATH = pl.Path(__file__).parent.parent.joinpath('pdfs')
 
 
-def fetch_and_save_pdf(pdf_url: str) -> pl.Path:
+def fetch_and_save_pdf(pdf_url: u.SearchResult) -> pl.Path:
     file_name = str(uuid.uuid4()) + '.pdf'
+    pdf_url = 'http://arxiv.org/pdf/' + pdf_url.id + '.pdf'
+    print(pdf_url)
     response = r.get(pdf_url, stream=True)
     response.raw.decode_content = True
     full_path = FOLDER_PATH.joinpath(file_name).resolve()

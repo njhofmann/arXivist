@@ -58,6 +58,7 @@ def suggest_mode():
         for idx, result in response:
             save_query.add_valid_id(idx, result)
             print(idx, result.title)
+            print(result.p)
 
         print("\noptions:\n"
               "- 'more id' to view more info\n"
