@@ -1,7 +1,7 @@
 from typing import List, Tuple, Dict, Union, Set
 import utility as u
 import psycopg2 as psy
-from src import retrieve_pdf as rpdf, retrieve_biblio as rb, db_insert as dbe, retrieve_paper as rp
+from src import pdf_utils as rpdf, retrieve_biblio as rb, db_insert as dbe, retrieve_paper as rp
 
 
 class UserSearchResponses(u.EqualEnum):
@@ -16,14 +16,14 @@ class SaveQuery:
 
     def __init__(self):
         self.selected_ids: Set[int] = set()
-        self.valid_ids_to_info: Dict[int, rp.SearchResult] = {}
+        self.valid_ids_to_info: Dict[int, u.SearchResult] = {}
 
     def add_valid_id(self, result_id: int, result: rp.SearchQuery) -> None:
         if result_id in self.valid_ids_to_info:
             raise ValueError(f'id {result_id} already added to list of valid ids')
         self.valid_ids_to_info[result_id] = result
 
-    def get_result(self, result_id: int) -> rp.SearchResult:
+    def get_result(self, result_id: int) -> u.SearchResult:
         if self.is_valid_id(result_id):
             return self.valid_ids_to_info[result_id]
         raise ValueError(f'id {result_id} is not a valid id')
@@ -51,39 +51,28 @@ class SaveQuery:
                     dbe.insert_search_query(cursor, result, references, pdf_path)
 
 
-def is_list_of_n_ints(to_parse: List[str], n: int = -1) -> List[int]:
-    if not to_parse:
-        return []
-    elif n > -1 and len(to_parse) != n:  # -1 means variable length
-        raise ValueError(f'given list {to_parse} must have only {n} entries')
-
-    for idx, entry in enumerate(to_parse):
-        to_parse[idx] = int(entry)
-    return to_parse
-
-
 def validate_user_result_response(response: List[str], save_query: SaveQuery) -> Tuple[UserSearchResponses,
                                                                                        Union[int, List[int]]]:
     if not response:
-        raise ValueError(f"not provided a response, must be one of {','.join([str(_) for _ in UserSearchResponses])}")
+        raise ValueError(f"not provided a response, must be one of {UserSearchResponses.values_as_str()}")
 
     cmd, params = response[0], response[1:]
     if not UserSearchResponses.is_valid_response(cmd):
-        raise ValueError(f"invalid response {cmd}, must be one of {','.join([str(_) for _ in UserSearchResponses])}")
+        raise ValueError(f"invalid response {cmd}, must be one of {UserSearchResponses.values_as_str()}")
 
     if cmd == UserSearchResponses.MORE:
-        selected_id = is_list_of_n_ints(params, 1)[0]
+        selected_id = u.is_list_of_n_ints(params, 1)[0]
         if not save_query.is_valid_id(selected_id):
             raise ValueError(f'selected id {selected_id} is not a valid id')
         return UserSearchResponses.MORE, selected_id
     elif cmd == UserSearchResponses.ADD:
-        return UserSearchResponses.ADD, is_list_of_n_ints(params)
+        return UserSearchResponses.ADD, u.is_list_of_n_ints(params)
     elif cmd == UserSearchResponses.CONT:
-        return UserSearchResponses.CONT, is_list_of_n_ints(params, 0)
+        return UserSearchResponses.CONT, u.is_list_of_n_ints(params, 0)
     elif cmd == UserSearchResponses.QUIT:
-        return UserSearchResponses.QUIT, is_list_of_n_ints(params, 0)
+        return UserSearchResponses.QUIT, u.is_list_of_n_ints(params, 0)
     else:
-        return UserSearchResponses.VIEW, is_list_of_n_ints(params, 0)
+        return UserSearchResponses.VIEW, u.is_list_of_n_ints(params, 0)
 
 
 def format_params(params: List[str]) -> List[str]:

@@ -1,7 +1,7 @@
 import utility as u
 
 class UserSuggestOptions(u.EqualEnum):
-    SUGGEST
+    SUGGEST = 'suggest'
 
 def suggest_mode():
     pass

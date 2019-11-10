@@ -1,5 +1,6 @@
 CREATE TABLE paper_info (
     arxiv_id TEXT PRIMARY KEY,
+    title TEXT,
     abstract TEXT NOT NULL ,
     published DATE NOT NULL,
     pdf_link TEXT NOT NULL,

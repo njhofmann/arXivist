@@ -19,15 +19,17 @@ def insert_paper_author(cursor, paper_id: str, author: str) -> None:
     get_generic_insertion(cursor, 'paper_author', columns_to_values)
 
 
-def insert_paper_info(cursor, paper_id: str, abstract: str, publish_date: str, pdf_link: str, pdf_path: pl.Path) -> None:
-    columns_to_values = {'arxiv_id': paper_id, 'abstract': abstract, 'published': publish_date,
+def insert_paper_info(cursor, paper_id: str, title: str, abstract: str, publish_date: str, pdf_link: str,
+                      pdf_path: pl.Path) -> None:
+    columns_to_values = {'arxiv_id': paper_id, 'title': title, 'abstract': abstract, 'published': publish_date,
                          'pdf_link': pdf_link, 'pdf_path': str(pdf_path)}
     get_generic_insertion(cursor, 'paper_info', columns_to_values)
 
 
 def insert_search_query(cursor, search_query: rp.SearchResult, references: List[str], pdf_path: pl.Path) -> None:
     insert_paper_info(cursor, paper_id=search_query.id, abstract=search_query.abstract,
-                      publish_date=search_query.publish, pdf_link=search_query.pdf_link, pdf_path=pdf_path)
+                      publish_date=search_query.publish, pdf_link=search_query.pdf_link,
+                      title=search_query.title, pdf_path=pdf_path)
 
     for author in search_query.authors:
         insert_paper_author(cursor, search_query.id, author)
