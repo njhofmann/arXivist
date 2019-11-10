@@ -1,6 +1,5 @@
-import psycopg2 as psy
 from psycopg2 import sql
-import retrieve_paper as rp
+from src import retrieve_paper as rp
 from typing import Dict, List
 import pathlib as pl
 

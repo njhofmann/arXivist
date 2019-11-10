@@ -1,5 +1,5 @@
 import requests as r
-from retrieve_paper import SearchResult
+from src.retrieve_paper import SearchResult
 from typing import List
 import json as j
 import re

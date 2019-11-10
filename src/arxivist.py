@@ -1,13 +1,27 @@
 from typing import List, Any, Tuple, Dict, Union, Set
-import retrieve_paper as rp
 import enum as e
 import sys
-import retrieve_biblio as rb
 import psycopg2 as psy
-import db_entries as dbe
-import retrieve_pdf as rpdf
+from src import retrieve_pdf as rpdf, retrieve_biblio as rb, db_entries as dbe, retrieve_paper as rp
 
 BAD_CHARS = (' ')
+
+
+class UserOptions(e.Enum):
+    SEARCH = 'search'
+    SUGGEST = 'suggest'
+    EXPLORE = 'explore'
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, type(self)):
+            return self is other
+        elif isinstance(other, str):
+            return other == self.value
+        return False
+
+    @staticmethod
+    def is_valid_response(response: str) -> bool:
+        return any([response == search_response for search_response in UserOptions])
 
 
 class UserSearchResponses(e.Enum):
@@ -18,7 +32,7 @@ class UserSearchResponses(e.Enum):
     QUIT = 'quit'
 
     def __eq__(self, other: Any) -> bool:
-        if isinstance(other, UserSearchResponses):
+        if isinstance(other, type(self)):
             return self is other
         elif isinstance(other, str):
             return other == self.value
@@ -116,9 +130,23 @@ def format_params(params: List[str]) -> List[str]:
     return list(filter(lambda x: bool(x), params))
 
 
+def parse_mode(mode: str) -> None:
+    if mode == UserOptions.EXPLORE:
+        pass
+    elif mode == UserOptions.SEARCH:
+        pass
+    elif mode == UserOptions.SUGGEST:
+        pass
+    raise ValueError(f'{mode} is not a supported mode')
+
+
 def main():
     while True:
         try:
+            mode = input(f"available modes are {', '.join([str(_) for _ in UserOptions])}")
+            parse_mode(mode)
+
+
             params = input('enter search params\n')
             params = format_params(params.split(' '))
             search_query = rp.SearchQuery.from_params(params)
@@ -155,9 +183,6 @@ def main():
                         break
                     elif cmd == UserSearchResponses.VIEW:
                         print(save_query)
-
-                for _ in responses:  # TODO fix clearing
-                    delete_last_line()
 
         except Exception as e:
             raise e
