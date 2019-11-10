@@ -46,7 +46,7 @@ class SaveQuery:
             with conn.cursor() as cursor:
                 for result_id in self.selected_ids:
                     result = self.get_result(result_id)
-                    pdf_path = rpdf.fetch_and_save_pdf(result.pdf_link)
+                    pdf_path = rpdf.fetch_and_save_pdf(result.pdf_url)
                     references = rb.retrieve_references(result)
                     dbe.insert_search_query(cursor, result, references, pdf_path)
 
@@ -57,7 +57,7 @@ def validate_user_result_response(response: List[str], save_query: SaveQuery) ->
         raise ValueError(f"not provided a response, must be one of {UserSearchResponses.values_as_str()}")
 
     cmd, params = response[0], response[1:]
-    if not UserSearchResponses.is_valid_response(cmd):
+    if not UserSearchResponses.is_valid(cmd):
         raise ValueError(f"invalid response {cmd}, must be one of {UserSearchResponses.values_as_str()}")
 
     if cmd == UserSearchResponses.MORE:

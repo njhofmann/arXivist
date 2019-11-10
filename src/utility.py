@@ -8,14 +8,15 @@ import dataclasses as dc
 @dc.dataclass
 class SearchResult:
     id: str  # arxiv id
-    title: str
-    abstract: str
-    publish: str
     authors: List[str]  # authors of paper in terms of ordership
-    pdf_link: str
+    title: str = ''
+    abstract: str = ''
+    publish: str = ''
+    pdf_url: str = ''
+    pdf_path: str = ''
 
     def __str__(self):
-        return f"Title: {self.title}\nAuthors: {','.join(self.authors)}\nAbstract: {self.abstract}"
+        return f"Title: {self.title}\nAuthors: {', '.join(self.authors)}\nAbstract: {self.abstract}"
 
     def __hash__(self):
         return hash(self.id)

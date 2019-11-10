@@ -101,7 +101,7 @@ class SearchQuery(u.BaseQuery):
             authors = [self.get_atom_child(author, 'name').text for author in self.get_atom_children(entry, 'author')]
 
             parsed_entries.append(u.SearchResult(title=title, id=arxiv_id, abstract=abstract, authors=authors,
-                                                 pdf_link=pdf_link, publish=date))
+                                                 pdf_url=pdf_link, publish=date))
         return parsed_entries
 
     def parse_error(self, error_msg: str):

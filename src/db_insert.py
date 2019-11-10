@@ -1,5 +1,5 @@
 from psycopg2 import sql
-from src import retrieve_paper as rp
+import utility as u
 from typing import Dict, List
 import pathlib as pl
 
@@ -26,9 +26,9 @@ def insert_paper_info(cursor, paper_id: str, title: str, abstract: str, publish_
     get_generic_insertion(cursor, 'paper_info', columns_to_values)
 
 
-def insert_search_query(cursor, search_query: rp.SearchResult, references: List[str], pdf_path: pl.Path) -> None:
+def insert_search_query(cursor, search_query: u.SearchResult, references: List[str], pdf_path: pl.Path) -> None:
     insert_paper_info(cursor, paper_id=search_query.id, abstract=search_query.abstract,
-                      publish_date=search_query.publish, pdf_link=search_query.pdf_link,
+                      publish_date=search_query.publish, pdf_link=search_query.pdf_url,
                       title=search_query.title, pdf_path=pdf_path)
 
     for author in search_query.authors:

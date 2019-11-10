@@ -1,5 +1,5 @@
 import requests as r
-from src.retrieve_paper import SearchResult
+import utility as u
 from typing import List
 import json as j
 import re
@@ -14,7 +14,7 @@ def get_arxiv_url(result: str) -> str:
     return BASE_URL + result
 
 
-def retrieve_references(search_result: SearchResult) -> List[str]:
+def retrieve_references(search_result: u.SearchResult) -> List[str]:
     response = r.get(get_arxiv_url(search_result.id))
     if response.ok:
         references = j.loads(response.content)['references']
@@ -24,5 +24,5 @@ def retrieve_references(search_result: SearchResult) -> List[str]:
 
 
 if __name__ == '__main__':
-    print(retrieve_references(SearchResult(title='test', authors=[], pdf_link='foo', abstract='foo', id='1509.06461')))
+    print(retrieve_references(u.SearchResult(title='test', authors=[], pdf_url='foo', abstract='foo', id='1509.06461')))
 

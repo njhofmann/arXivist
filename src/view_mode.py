@@ -12,12 +12,12 @@ class UserViewModes(u.EqualEnum):
     OPEN = 'open'
 
 
-def validate_user_result_response(response: List[str], save_query: sm.SaveQuery) -> UserViewModes
+def validate_user_result_response(response: List[str], save_query: sm.SaveQuery) -> UserViewModes:
     if not response:
         raise ValueError(f"not provided a response, must be one of {UserViewModes.values_as_str()}")
 
     cmd, params = response[0], response[1:]
-    if not UserViewModes.is_valid_response(cmd):
+    if not UserViewModes.is_valid(cmd):
         raise ValueError(f"invalid response {cmd}, must be one of {UserViewModes.values_as_str()}")
 
     if cmd == UserViewModes.MORE:
@@ -37,17 +37,35 @@ def validate_user_result_response(response: List[str], save_query: sm.SaveQuery)
         if not save_query.is_valid_id(selected_id):
             raise ValueError(f'selected id {selected_id} is not a valid id')
         else:
-            pu.open_paper(save_query.get_result(selected_id))
+            pu.open_pdf(save_query.get_result(selected_id).pdf_path)
         return UserViewModes.OPEN
 
 
 def view_mode():
-    while True:
-        search_params = input('enter search params').split(' ')
-        results = dbr.DatabaseQuery.from_params(search_params)
+    search_params = [param for param in input('enter search params\n').split(' ') if param]
+    db_query = dbr.DatabaseQuery.from_params(search_params)
 
-        save_query = sm.SaveQuery()
-        for idx, result in results:
+    results = db_query.get_results()
+    save_query = sm.SaveQuery()
+
+    for response in results:
+        for idx, result in response:
             save_query.add_valid_id(idx, result)
             print(idx, result.title)
 
+            print("\noptions:\n"
+                  "- 'more id' to view more info\n"
+                  "- 'cont' to view more results\n"
+                  "- 'open id' to open current selected paper\n"
+                  "- 'quit' to terminate viewing")
+
+            wait_on_user = True
+            while wait_on_user:
+                results_response = input('waiting...\n')
+                results_response = [result for result in results_response.split(' ') if result]
+                cmd = validate_user_result_response(results_response, save_query)
+
+                if cmd == UserViewModes.CONT:
+                    wait_on_user = False
+                elif cmd == UserViewModes.QUIT:
+                    break
