@@ -3,8 +3,6 @@ import pathlib as pl
 import uuid
 import subprocess as sbp
 import utility as u
-import search_mode as sm
-import retrieve_paper as rp
 
 FOLDER_PATH = pl.Path(__file__).parent.parent.joinpath('pdfs')
 

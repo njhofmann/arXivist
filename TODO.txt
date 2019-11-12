@@ -1,0 +1,19 @@
+Major
+-refactor existing codebase
+-add docs to existing codebase
+-expand upon existing features for each mode
+  -keyword args for search
+  -removal of added papers
+-steps to publish as library or fully fledged app
+
+Minor
+-fixed display issue for viewing retrieved papers
+-clear previously displayed text
+-separate out io for testing and prod
+-config file for database info
+-database creation file
+-make query searchs all be lowercase
+-catch arg parser exceptions / override it
+-more advanced arg parser
+  -options for all
+  -
