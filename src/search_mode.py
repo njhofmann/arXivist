@@ -90,6 +90,7 @@ def search_mode():
 
     save_query = SaveQuery()
     for responses in search_query.retrieve_search_results():
+        time_to_quit = False
         for result_id, response in responses:
             title = response.title
             save_query.add_valid_id(result_id, response)
@@ -117,8 +118,10 @@ def search_mode():
                 wait_on_user = False
             elif cmd == UserSearchResponses.QUIT:
                 save_query.submit()
+                time_to_quit = True
                 break
             elif cmd == UserSearchResponses.VIEW:
                 print(save_query)
 
-        break
+        if time_to_quit:
+            break

@@ -49,6 +49,7 @@ def view_mode():
     save_query = sm.SaveQuery()
 
     for response in results:
+        time_to_quit = False
         for idx, result in response:
             save_query.add_valid_id(idx, result)
             print(idx, result.title)
@@ -68,4 +69,8 @@ def view_mode():
                 if cmd == UserViewModes.CONT:
                     wait_on_user = False
                 elif cmd == UserViewModes.QUIT:
+                    time_to_quit = True
                     break
+
+        if time_to_quit:
+            break

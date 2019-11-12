@@ -55,10 +55,10 @@ def suggest_mode():
     
     save_query = se.SaveQuery()
     for response in results:
+        time_to_quit = False
         for idx, result in response:
             save_query.add_valid_id(idx, result)
             print(idx, result.title)
-            print(result.p)
 
         print("\noptions:\n"
               "- 'more id' to view more info\n"
@@ -75,6 +75,10 @@ def suggest_mode():
             if cmd == UserSuggestOptions.CONT:
                 wait_on_user = False
             elif cmd == UserSuggestOptions.QUIT:
+                time_to_quit = True
                 break
+
+        if time_to_quit:
+            break
 
 
