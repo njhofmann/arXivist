@@ -1,7 +1,7 @@
 from typing import List, Tuple, Union
 import utility as u
 import retrieve_paper as rp
-from db_insert import SaveQuery
+from utility import SaveQuery
 
 
 class UserSearchResponses(u.CommandEnum):

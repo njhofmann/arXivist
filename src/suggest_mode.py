@@ -1,4 +1,3 @@
-import db_insert
 import utility
 import utility as u
 from typing import List, Union, Tuple
@@ -17,7 +16,7 @@ class UserSuggestOptions(u.CommandEnum):
     VIEW = 'view'
 
 
-def validate_user_result_response(response: List[str], save_query: db_insert.SaveQuery) -> UserSuggestOptions:
+def validate_user_result_response(response: List[str], save_query: utility.SaveQuery) -> UserSuggestOptions:
     if not response:
         raise ValueError(f"not provided a response, must be one of {UserSuggestOptions.values_as_str()}")
 
@@ -55,7 +54,7 @@ def suggest_mode():
     search_query = rp.SearchQuery(id_params=suggestion_ids)
     results = search_query.retrieve_search_results()
     
-    save_query = db_insert.SaveQuery()
+    save_query = utility.SaveQuery()
     for response in results:
         time_to_quit = False
         for idx, result in response:

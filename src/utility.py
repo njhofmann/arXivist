@@ -1,8 +1,13 @@
-from typing import Any, List, Iterable, Callable
+from typing import Any, List, Iterable, Set, Dict, Callable
 import enum as e
 import abc
 import argparse as ap
 import dataclasses as dc
+import psycopg2 as psy
+import db_insert as dbe
+import pdf_utils as rpdf
+import retrieve_biblio as rb
+import retrieve_paper as rp
 
 
 class ArgumentParserException(Exception):
@@ -42,6 +47,46 @@ class SearchResult:
             self.authors = [author]
 
 
+
+class SaveQuery:
+
+    def __init__(self):
+        self.selected_ids: Set[int] = set()
+        self.valid_ids_to_info: Dict[int, SearchResult] = {}
+
+    def add_valid_id(self, result_id: int, result: rp.SearchQuery) -> None:
+        if result_id in self.valid_ids_to_info:
+            raise ValueError(f'id {result_id} already added to list of valid ids')
+        self.valid_ids_to_info[result_id] = result
+
+    def get_result(self, result_id: int) -> SearchResult:
+        if self.is_valid_id(result_id):
+            return self.valid_ids_to_info[result_id]
+        raise ValueError(f'id {result_id} is not a valid id')
+
+    def select_id(self, param: int) -> None:
+        if not self.is_valid_id(param):
+            raise ValueError(f'{param} not in list of valid ids')
+        self.selected_ids.add(param)
+
+    def is_valid_id(self, result_id: int) -> bool:
+        return result_id in self.valid_ids_to_info
+
+    def __str__(self):
+        if self.selected_ids:
+            return f"save query: {', '.join([str(entry) for entry in self.selected_ids])}"
+        return 'nothing in save query'
+
+    def submit(self) -> None:
+        with psy.connect(dbname='arxiv') as conn:
+            with conn.cursor() as cursor:
+                for result_id in self.selected_ids:
+                    result = self.get_result(result_id)
+                    pdf_path = rpdf.fetch_and_save_pdf(result)
+                    references = rb.retrieve_references(result)
+                    dbe.insert_search_query(cursor, result, references, pdf_path)
+
+
 class BaseQuery(abc.ABC):
 
     def __init__(self, title_params: Iterable[str] = (), author_params: Iterable[str] = (),
@@ -76,7 +121,7 @@ class BaseQuery(abc.ABC):
 
 
 class CommandEnum(e.Enum):
-    """Enum representing a mapping of discrete keywords to associated """
+    """Enum representing a set of available keywords for a user to enter"""
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, type(self)):
             return self is other
@@ -87,13 +132,6 @@ class CommandEnum(e.Enum):
     @classmethod
     def is_valid(cls: type, other: str) -> bool:
         return any([other == item.name.lower() for item in cls])
-
-    @classmethod
-    def get_command_method(cls, command: str) -> Callable:
-        for item in cls:
-            if command == item.name.lower():
-                return item.value()
-        raise ValueError(f'command {command} is an unsupported command')
 
     @classmethod
     def values_as_str(cls: e.Enum) -> str:
