@@ -1,8 +1,63 @@
-from typing import Any, List, Iterable
+from typing import Any, List, Iterable, Set, Dict
 import enum as e
 import abc
 import argparse as ap
 import dataclasses as dc
+import psycopg2 as psy
+import db_insert as dbe
+import pdf_utils as rpdf
+import retrieve_biblio as rb
+import retrieve_paper as rp
+
+
+class ArgumentParserException(Exception):
+    pass
+
+
+class RaisingArgParser(ap.ArgumentParser):
+    """Custom ArggumentParser class that raises exceptions instead of exiting the system."""
+
+    def error(self, msg: str):
+        raise ArgumentParserException(msg)
+
+
+class SaveQuery:
+
+    def __init__(self):
+        self.selected_ids: Set[int] = set()
+        self.valid_ids_to_info: Dict[int, u.SearchResult] = {}
+
+    def add_valid_id(self, result_id: int, result: rp.SearchQuery) -> None:
+        if result_id in self.valid_ids_to_info:
+            raise ValueError(f'id {result_id} already added to list of valid ids')
+        self.valid_ids_to_info[result_id] = result
+
+    def get_result(self, result_id: int) -> u.SearchResult:
+        if self.is_valid_id(result_id):
+            return self.valid_ids_to_info[result_id]
+        raise ValueError(f'id {result_id} is not a valid id')
+
+    def select_id(self, param: int) -> None:
+        if not self.is_valid_id(param):
+            raise ValueError(f'{param} not in list of valid ids')
+        self.selected_ids.add(param)
+
+    def is_valid_id(self, result_id: int) -> bool:
+        return result_id in self.valid_ids_to_info
+
+    def __str__(self):
+        if self.selected_ids:
+            return f"save query: {', '.join([str(entry) for entry in self.selected_ids])}"
+        return 'nothing in save query'
+
+    def submit(self) -> None:
+        with psy.connect(dbname='arxiv') as conn:
+            with conn.cursor() as cursor:
+                for result_id in self.selected_ids:
+                    result = self.get_result(result_id)
+                    pdf_path = rpdf.fetch_and_save_pdf(result)
+                    references = rb.retrieve_references(result)
+                    dbe.insert_search_query(cursor, result, references, pdf_path)
 
 
 @dc.dataclass
@@ -47,11 +102,12 @@ class BaseQuery(abc.ABC):
         self.start = start
 
     @staticmethod
-    def get_parser() -> ap.ArgumentParser:
-        parser = ap.ArgumentParser()
+    def get_parser() -> RaisingArgParser:
+        parser = RaisingArgParser
+        parser.add_argument('-a', '--all', nargs='*', type=str, default=[])
         parser.add_argument('-id', '--arvix_id', nargs='*', type=str, default=[])
         parser.add_argument('-t', '--title', nargs='*', type=str, default=[])
-        parser.add_argument('-a', '--author', nargs='*', type=str, default=[])
+        parser.add_argument('-au', '--author', nargs='*', type=str, default=[])
         parser.add_argument('-ab', '--abstract', nargs='*', type=str, default=[])
         return parser
 
@@ -76,7 +132,7 @@ class EqualEnum(e.Enum):
         return any([other == item.value for item in cls])
 
     @classmethod
-    def values_as_str(cls: type) -> str:
+    def values_as_str(cls: e.Enum) -> str:
         return ', '.join(item.value for item in cls)
 
 

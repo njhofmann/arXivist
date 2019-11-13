@@ -1,3 +1,4 @@
+import utility
 import utility as u
 import db_retrieve as dbr
 import search_mode as sm
@@ -12,7 +13,7 @@ class UserViewModes(u.EqualEnum):
     OPEN = 'open'
 
 
-def validate_user_result_response(response: List[str], save_query: sm.SaveQuery) -> UserViewModes:
+def validate_user_result_response(response: List[str], save_query: utility.SaveQuery) -> UserViewModes:
     if not response:
         raise ValueError(f"not provided a response, must be one of {UserViewModes.values_as_str()}")
 
@@ -46,7 +47,7 @@ def view_mode():
     db_query = dbr.DatabaseQuery.from_params(search_params)
 
     results = db_query.get_results()
-    save_query = sm.SaveQuery()
+    save_query = utility.SaveQuery()
 
     for response in results:
         time_to_quit = False
@@ -58,7 +59,7 @@ def view_mode():
                   "- 'more id' to view more info\n"
                   "- 'cont' to view more results\n"
                   "- 'open id' to open current selected paper\n"
-                  "- 'quit' to terminate viewing")
+                  "- 'quit' to terminate viewing\n")
 
             wait_on_user = True
             while wait_on_user:

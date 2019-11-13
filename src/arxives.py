@@ -28,7 +28,7 @@ def parse_mode(mode: str) -> None:
 def main():
     while True:
         try:
-            user_mode = input(f"available modes are {', '.join([mode.value for mode in UserOptions])}\n")
+            user_mode = input(f"available modes are {UserOptions.values_as_str()}\n")
             parse_mode(user_mode)
         except Exception as e:
             print(e)
