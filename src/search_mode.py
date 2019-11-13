@@ -1,10 +1,10 @@
 from typing import List, Tuple, Union
 import utility as u
 import retrieve_paper as rp
-from utility import SaveQuery
+from db_insert import SaveQuery
 
 
-class UserSearchResponses(u.EqualEnum):
+class UserSearchResponses(u.CommandEnum):
     MORE = 'more'
     CONT = 'cont'
     VIEW = 'view'

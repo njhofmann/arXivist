@@ -5,31 +5,18 @@ import suggest_mode as sm
 import sys
 
 
-class UserOptions(u.EqualEnum):
-    SEARCH = 'search'
-    SUGGEST = 'suggest'
-    VIEW = 'view'
-    EXIT = 'exit'
-
-
-def parse_mode(mode: str) -> None:
-    if mode == UserOptions.VIEW:
-        ve.view_mode()
-    elif mode == UserOptions.SEARCH:
-        se.search_mode()
-    elif mode == UserOptions.SUGGEST:
-        sm.suggest_mode()
-    elif mode == UserOptions.EXIT:
-        sys.exit()
-    else:
-        raise ValueError(f'{mode} is not a supported mode')
+class UserOptions(u.CommandEnum):
+    SEARCH = se.search_mode
+    SUGGEST = sm.suggest_mode
+    VIEW = ve.view_mode
+    EXIT = sys.exit
 
 
 def main():
     while True:
         try:
             user_mode = input(f"available modes are {UserOptions.values_as_str()}\n")
-            parse_mode(user_mode)
+            UserOptions.get_command_method(user_mode)()
         except Exception as e:
             print(e)
 

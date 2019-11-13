@@ -1,3 +1,4 @@
+import db_insert
 import utility
 import utility as u
 import db_retrieve as dbr
@@ -6,14 +7,14 @@ from typing import List, Tuple, Union
 import pdf_utils as pu
 
 
-class UserViewModes(u.EqualEnum):
+class UserViewModes(u.CommandEnum):
     QUIT = 'quit'
     CONT = 'cont'
     MORE = 'more'
     OPEN = 'open'
 
 
-def validate_user_result_response(response: List[str], save_query: utility.SaveQuery) -> UserViewModes:
+def validate_user_result_response(response: List[str], save_query: db_insert.SaveQuery) -> UserViewModes:
     if not response:
         raise ValueError(f"not provided a response, must be one of {UserViewModes.values_as_str()}")
 
@@ -47,7 +48,7 @@ def view_mode():
     db_query = dbr.DatabaseQuery.from_params(search_params)
 
     results = db_query.get_results()
-    save_query = utility.SaveQuery()
+    save_query = db_insert.SaveQuery()
 
     for response in results:
         time_to_quit = False

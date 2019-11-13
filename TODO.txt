@@ -1,5 +1,6 @@
 Major
 -refactor existing codebase
+  -generalized command -> function??
 -add docs to existing codebase
 -expand upon existing features for each mode
   -keyword args for search
