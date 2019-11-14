@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any, List, Iterable, Set, Dict
 import enum as e
 import abc
@@ -8,6 +9,11 @@ import db_insert as dbe
 import pdf_utils as rpdf
 import retrieve_biblio as rb
 import retrieve_paper as rp
+
+
+def split_and_format_string(to_format: str) -> List[str]:
+    to_format = to_format.split(' ')
+    return [char for char in to_format if char]
 
 
 class ArgumentParserException(Exception):
@@ -115,11 +121,11 @@ class BaseQuery(abc.ABC):
     def from_params(cls: type, params: List[str]):
         parser = BaseQuery.get_parser()
         args = parser.parse_args(params)
-        return cls(title_params=args.title, id_params=args.arvix_id,
-                   abstract_params=args.abstract, author_params=args.author)
+        return cls(title_params=args.title + args.all, id_params=args.arvix_id + args.all,
+                   abstract_params=args.abstract + args.all, author_params=args.author + args.all)
 
 
-class EqualEnum(e.Enum):
+class CommandEnum(e.Enum, abc.ABC):
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, type(self)):
             return self is other
@@ -135,6 +141,25 @@ class EqualEnum(e.Enum):
     def values_as_str(cls: e.Enum) -> str:
         return ', '.join(item.value for item in cls)
 
+    @classmethod
+    @abc.abstractmethod
+    def execute_params(cls, params: List[str], save_query: SaveQuery = None) -> CommandEnum:
+        """
+        Maps the relationship between each defined type of CommandEnum and associated operations. Given a list of
+        parameters, a command and any relevant arguments, attempts to execute operations associated with command listed
+        in the params, should be the first item in the list - ie "cmd arg1 ... argn". Throws ValueError if unsupported
+        command is given or if incorrect args are given. Returns the type of CommandEnum that was executed.
+        :param params: list of params to execute an operation associated with a type of CommandEnum
+        :param save_query: optional param, used for storing any neccessary info related to previously retrieved info
+        :return: type of CommandEnum executed
+        """
+        if not params:
+            raise ValueError(f"not provided a response, must be one of {cls.values_as_str()}")
+
+        cmd = params[0]
+        if not cls.is_valid(cmd):
+            raise ValueError(f"invalid response {cmd}, must be one of {cls.values_as_str()}")
+
 
 def is_list_of_n_ints(to_parse: List[str], n: int = -1) -> List[int]:
     if not to_parse:
@@ -148,7 +173,7 @@ def is_list_of_n_ints(to_parse: List[str], n: int = -1) -> List[int]:
 
 
 if __name__ == '__main__':
-    class Foo(EqualEnum):
+    class Foo(CommandEnum):
         A = 'A'
         B = 'B'
 

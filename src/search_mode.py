@@ -1,39 +1,49 @@
+from __future__ import annotations
 from typing import List, Tuple, Union
 import utility as u
 import retrieve_paper as rp
 from utility import SaveQuery
 
 
-class UserSearchResponses(u.EqualEnum):
+class UserSearchResponses(u.CommandEnum):
     MORE = 'more'
     CONT = 'cont'
     VIEW = 'view'
     ADD = 'add'
     QUIT = 'quit'
 
+    @classmethod
+    def execute_params(cls, params: List[str], save_query: SaveQuery = None) -> UserSearchResponses:
+        super().execute_params(params, save_query)
 
-def validate_user_result_response(response: List[str], save_query: SaveQuery) -> Tuple[UserSearchResponses,
-                                                                                       Union[int, List[int]]]:
-    if not response:
-        raise ValueError(f"not provided a response, must be one of {UserSearchResponses.values_as_str()}")
+        cmd, params = params[0], params[1:]
 
-    cmd, params = response[0], response[1:]
-    if not UserSearchResponses.is_valid(cmd):
-        raise ValueError(f"invalid response {cmd}, must be one of {UserSearchResponses.values_as_str()}")
+        if cmd == UserSearchResponses.MORE:
+            selected_id = u.is_list_of_n_ints(params, 1)[0]
+            if not save_query.is_valid_id(selected_id):
+                raise ValueError(f'selected id {selected_id} is not a valid id')
+            print(save_query.get_result(selected_id))
+            return UserSearchResponses.MORE
 
-    if cmd == UserSearchResponses.MORE:
-        selected_id = u.is_list_of_n_ints(params, 1)[0]
-        if not save_query.is_valid_id(selected_id):
-            raise ValueError(f'selected id {selected_id} is not a valid id')
-        return UserSearchResponses.MORE, selected_id
-    elif cmd == UserSearchResponses.ADD:
-        return UserSearchResponses.ADD, u.is_list_of_n_ints(params)
-    elif cmd == UserSearchResponses.CONT:
-        return UserSearchResponses.CONT, u.is_list_of_n_ints(params, 0)
-    elif cmd == UserSearchResponses.QUIT:
-        return UserSearchResponses.QUIT, u.is_list_of_n_ints(params, 0)
-    else:
-        return UserSearchResponses.VIEW, u.is_list_of_n_ints(params, 0)
+        elif cmd == UserSearchResponses.ADD:
+            for param in params:
+                save_query.select_id(param)
+            u.is_list_of_n_ints(params)
+            return UserSearchResponses.ADD
+
+        elif cmd == UserSearchResponses.CONT:
+            u.is_list_of_n_ints(params, 0)
+            return UserSearchResponses.CONT
+
+        elif cmd == UserSearchResponses.QUIT:
+            save_query.submit()
+            u.is_list_of_n_ints(params, 0)
+            return UserSearchResponses.QUIT
+
+        else:
+            u.is_list_of_n_ints(params, 0)
+            print(save_query)
+            return UserSearchResponses.VIEW
 
 
 def format_params(params: List[str]) -> List[str]:
@@ -65,24 +75,15 @@ def search_mode():
               "- 'quit' to terminate responses and submit save query")
 
         wait_on_user = True
-        while wait_on_user:
-            results_response = input('waiting...\n')
-            results_response = [result for result in results_response.split(' ') if result]
-            cmd, params = validate_user_result_response(results_response, save_query)
+        while True:
+            results_response = u.split_and_format_string(input('waiting...\n'))
+            cmd, params = UserSearchResponses.execute_params(results_response, save_query)
 
-            if cmd == UserSearchResponses.MORE:
-                print(save_query.get_result(params))
-            elif cmd == UserSearchResponses.ADD:
-                for param in params:
-                    save_query.select_id(param)
-            elif cmd == UserSearchResponses.CONT:
-                wait_on_user = False
+            if cmd == UserSearchResponses.CONT:
+                break
             elif cmd == UserSearchResponses.QUIT:
-                save_query.submit()
                 time_to_quit = True
                 break
-            elif cmd == UserSearchResponses.VIEW:
-                print(save_query)
 
         if time_to_quit:
             break

@@ -1,22 +1,21 @@
 Major
 -refactor existing codebase
+  -Relook at command enums
 -add docs to existing codebase
 -expand upon existing features for each mode
   -keyword args for search
   -removal of added papers
 -steps to publish as library or fully fledged app
--biorxiv
+-biorxiv, add any research paper from article
 
 Minor
 -fixed display issue for viewing retrieved papers
--all option for search queries
 -clear previously displayed text
 -separate out io for testing and prod
 -different pdf utilities per operating system
 -config file for database info
 -database creation file
 -make query searchs all be lowercase
--catch arg parser exceptions / override it
 -more advanced arg parser
   -options for all
   -
