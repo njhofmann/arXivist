@@ -1,7 +1,5 @@
 Major
 -refactor existing codebase
-  -fix circular dependency issue
-  -Relook at command enums
 -add docs to existing codebase
 -expand upon existing features for each mode
   -keyword args for search
@@ -10,9 +8,9 @@ Major
 -biorxiv, add any research paper from article
 
 Minor
--fixed display issue for viewing retrieved papers
 -clear previously displayed text
 -separate out io for testing and prod
+-handling versioning
 -different pdf utilities per operating system
 -config file for database info
 -database creation file

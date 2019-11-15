@@ -31,7 +31,7 @@ class BaseQuery(abc.ABC):
 
     @staticmethod
     def get_parser() -> RaisingArgParser:
-        parser = RaisingArgParser
+        parser = RaisingArgParser(prefix_chars='-')
         parser.add_argument('-a', '--all', nargs='*', type=str, default=[])
         parser.add_argument('-id', '--arvix_id', nargs='*', type=str, default=[])
         parser.add_argument('-t', '--title', nargs='*', type=str, default=[])

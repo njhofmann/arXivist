@@ -72,13 +72,10 @@ class DatabaseQuery(bq.BaseQuery):
 
         search_results = self.aggregate_results(results)
         count = self.start
-        if count < len(search_results):
-            while count < len(search_results):
-                gen_results = search_results[count:count + self.max_result]
-                yield [(count + idx, result) for idx, result in enumerate(gen_results)]
-                count += self.max_result
-        else:
-            yield []
+        while count < len(search_results):
+            gen_results = search_results[count:count + self.max_result]
+            yield [(count + idx, result) for idx, result in enumerate(gen_results)]
+            count += self.max_result
 
 
 def get_suggestions(cursor) -> List[str]:
@@ -90,6 +87,7 @@ def get_suggestions(cursor) -> List[str]:
         sql.Identifier('p', 'parent_id'))
     cursor.execute(query)
     return [result[0] for result in cursor.fetchall()]
+
 
 if __name__ == '__main__':
     get_suggestions()

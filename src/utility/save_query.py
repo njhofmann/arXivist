@@ -7,6 +7,7 @@ import src.api.retrieve_biblio as rb
 import src.database.db_insert as dbi
 import src.pdf_utils as pu
 
+
 class SaveQuery:
 
     def __init__(self):

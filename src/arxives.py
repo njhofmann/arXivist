@@ -39,7 +39,7 @@ def main():
             user_mode = input(f"available modes are {UserOptions.values_as_str()}\n").split(' ')
             UserOptions.execute_params(user_mode)
         except Exception as e:
-            print(e)
+            raise e
 
 
 if __name__ == '__main__':
