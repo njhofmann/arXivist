@@ -1,5 +1,6 @@
 Major
 -refactor existing codebase
+  -fix circular dependency issue
   -Relook at command enums
 -add docs to existing codebase
 -expand upon existing features for each mode

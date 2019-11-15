@@ -1,20 +1,19 @@
 from __future__ import annotations
 from typing import List
-import utility as u
-import search_mode as se
-import view_mode as ve
-import suggest_mode as sm
+from modes import search_mode as se, view_mode as ve, suggest_mode as sm
+import src.utility.save_query as sq
+import src.utility.command_enum as ce
 import sys
 
 
-class UserOptions(u.CommandEnum):
+class UserOptions(ce.CommandEnum):
     SEARCH = 'search'
     SUGGEST = 'suggest'
     VIEW = 'view'
     EXIT = 'exit'
 
     @classmethod
-    def execute_params(cls, params: List[str], search_query: u.SaveQuery = None) -> UserOptions:
+    def execute_params(cls, params: List[str], search_query: sq.SaveQuery = None) -> UserOptions:
         if not params or len(params) > 1:
             raise ValueError(f'UserOptions only requires one param')
 

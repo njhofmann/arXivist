@@ -1,10 +1,11 @@
 import psycopg2 as psy
 from psycopg2 import sql
 from typing import List, Tuple, Iterable, Dict
-import utility as u
+import src.utility.search_result as sr
+import src.utility.base_query as bq
 
 
-class DatabaseQuery(u.BaseQuery):
+class DatabaseQuery(bq.BaseQuery):
 
     def __init__(self, title_params: Iterable[str] = (), author_params: Iterable[str] = (),
                  abstract_params: Iterable[str] = (), id_params: Iterable[str] = (),
@@ -52,18 +53,18 @@ class DatabaseQuery(u.BaseQuery):
         full_query = sql.SQL(base_query).format(*base_identifiers)
         return full_query
 
-    def aggregate_results(self, results: List[Tuple[str, str, str, str, str]]) -> List[u.SearchResult]:
-        search_results: Dict[str, u.SearchResult] = {}
+    def aggregate_results(self, results: List[Tuple[str, str, str, str, str]]) -> List[sr.SearchResult]:
+        search_results: Dict[str, sr.SearchResult] = {}
         for result in results:
             arxiv_id, title, abstract, pdf_path, author = result
             if arxiv_id in search_results:
                 search_results.get(arxiv_id).add_author(author)
             else:
-                search_results[arxiv_id] = u.SearchResult(title=title, pdf_path=pdf_path, abstract=abstract,
+                search_results[arxiv_id] = sr.SearchResult(title=title, pdf_path=pdf_path, abstract=abstract,
                                                           authors=[author], id=arxiv_id)
         return list(search_results.values())
 
-    def get_results(self) -> List[Tuple[int, u.SearchResult]]:
+    def get_results(self) -> List[Tuple[int, sr.SearchResult]]:
         with psy.connect(dbname='arxiv') as conn:
             with conn.cursor() as cursor:
                 cursor.execute(self.as_sql_query())

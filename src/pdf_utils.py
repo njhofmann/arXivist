@@ -2,7 +2,7 @@ import requests as r
 import pathlib as pl
 import uuid
 import subprocess as sbp
-import utility as u
+from utility import search_result as u
 
 FOLDER_PATH = pl.Path(__file__).parent.parent.joinpath('pdfs')
 

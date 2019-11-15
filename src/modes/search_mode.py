@@ -1,11 +1,12 @@
 from __future__ import annotations
-from typing import List, Tuple, Union
-import utility as u
-import retrieve_paper as rp
-from utility import SaveQuery
+from typing import List
+import src.utility.search_result as sr
+import src.api.retrieve_paper as rp
+import src.utility.save_query as sq
+import src.utility.command_enum as ce
 
 
-class UserSearchResponses(u.CommandEnum):
+class UserSearchResponses(ce.CommandEnum):
     MORE = 'more'
     CONT = 'cont'
     VIEW = 'view'
@@ -13,13 +14,13 @@ class UserSearchResponses(u.CommandEnum):
     QUIT = 'quit'
 
     @classmethod
-    def execute_params(cls, params: List[str], save_query: SaveQuery = None) -> UserSearchResponses:
+    def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserSearchResponses:
         super().execute_params(params, save_query)
 
         cmd, params = params[0], params[1:]
 
         if cmd == UserSearchResponses.MORE:
-            selected_id = u.is_list_of_n_ints(params, 1)[0]
+            selected_id = save_query.command_enum.is_list_of_n_ints(params, 1)[0]
             if not save_query.is_valid_id(selected_id):
                 raise ValueError(f'selected id {selected_id} is not a valid id')
             print(save_query.get_result(selected_id))
@@ -28,20 +29,20 @@ class UserSearchResponses(u.CommandEnum):
         elif cmd == UserSearchResponses.ADD:
             for param in params:
                 save_query.select_id(param)
-            u.is_list_of_n_ints(params)
+            save_query.command_enum.is_list_of_n_ints(params)
             return UserSearchResponses.ADD
 
         elif cmd == UserSearchResponses.CONT:
-            u.is_list_of_n_ints(params, 0)
+            save_query.command_enum.is_list_of_n_ints(params, 0)
             return UserSearchResponses.CONT
 
         elif cmd == UserSearchResponses.QUIT:
             save_query.submit()
-            u.is_list_of_n_ints(params, 0)
+            save_query.command_enum.is_list_of_n_ints(params, 0)
             return UserSearchResponses.QUIT
 
         else:
-            u.is_list_of_n_ints(params, 0)
+            save_query.command_enum.is_list_of_n_ints(params, 0)
             print(save_query)
             return UserSearchResponses.VIEW
 
@@ -59,7 +60,7 @@ def search_mode():
     params = format_params(params.split(' '))
     search_query = rp.SearchQuery.from_params(params)
 
-    save_query = SaveQuery()
+    save_query = sq.SaveQuery()
     for responses in search_query.retrieve_search_results():
         time_to_quit = False
         for result_id, response in responses:
@@ -76,7 +77,7 @@ def search_mode():
 
         wait_on_user = True
         while True:
-            results_response = u.split_and_format_string(input('waiting...\n'))
+            results_response = sr.split_and_format_string(input('waiting...\n'))
             cmd, params = UserSearchResponses.execute_params(results_response, save_query)
 
             if cmd == UserSearchResponses.CONT:

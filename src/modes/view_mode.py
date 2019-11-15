@@ -1,38 +1,39 @@
 from __future__ import annotations
-import utility as u
-import db_retrieve as dbr
-import search_mode as sm
-from typing import List, Tuple, Union
-import pdf_utils as pu
+import src.utility.search_result as sr
+from database import db_retrieve as dbr
+from typing import List
+import src.utility.save_query as sq
+import src.pdf_utils as pu
+import src.utility.command_enum as ce
 
 
-class UserViewModes(u.CommandEnum):
+class UserViewModes(ce.CommandEnum):
     QUIT = 'quit'
     CONT = 'cont'
     MORE = 'more'
     OPEN = 'open'
 
     @classmethod
-    def execute_params(cls, params: List[str], save_query: u.SaveQuery = None) -> UserViewModes:
+    def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserViewModes:
         super().execute_params(params, save_query)
         cmd, params = params[0], params[1:]
 
         if cmd == UserViewModes.MORE:
-            selected_id = u.is_list_of_n_ints(params, 1)[0]
+            selected_id = save_query.command_enum.is_list_of_n_ints(params, 1)[0]
             if not save_query.is_valid_id(selected_id):
                 raise ValueError(f'selected id {selected_id} is not a valid id')
             print(save_query.get_result(selected_id))
             return UserViewModes.MORE
         elif cmd == UserViewModes.CONT:
-            u.is_list_of_n_ints(params, 0)
+            save_query.command_enum.is_list_of_n_ints(params, 0)
             return UserViewModes.CONT
 
         elif cmd == UserViewModes.QUIT:
-            u.is_list_of_n_ints(params, 0)
+            save_query.command_enum.is_list_of_n_ints(params, 0)
             return UserViewModes.QUIT
 
         else:
-            selected_id = u.is_list_of_n_ints(params, 1)[0]
+            selected_id = save_query.command_enum.is_list_of_n_ints(params, 1)[0]
             if not save_query.is_valid_id(selected_id):
                 raise ValueError(f'selected id {selected_id} is not a valid id')
             else:
@@ -45,7 +46,7 @@ def view_mode():
     db_query = dbr.DatabaseQuery.from_params(search_params)
 
     results = db_query.get_results()
-    save_query = u.SaveQuery()
+    save_query = sq.SaveQuery()
 
     for response in results:
         time_to_quit = False
@@ -60,7 +61,7 @@ def view_mode():
                   "- 'quit' to terminate viewing\n")
 
             while True:
-                results_response = u.split_and_format_string(input('waiting...\n'))
+                results_response = sr.split_and_format_string(input('waiting...\n'))
                 cmd = UserViewModes.execute_params(results_response, save_query)
 
                 if cmd == UserViewModes.CONT:
