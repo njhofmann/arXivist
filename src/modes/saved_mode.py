@@ -1,37 +1,39 @@
 from __future__ import annotations
 import src.utility.search_result as sr
-from database import db_retrieve as dbr
+from database import retrieve as dbr
 from typing import List
 import src.utility.save_query as sq
 import src.pdf_utils as pu
 import src.utility.command_enum as ce
 
+"""Mode for viewing, removing, or editing previously saved entries."""
 
-class UserViewModes(ce.CommandEnum):
-    QUIT = 'quit'
-    CONT = 'cont'
-    MORE = 'more'
-    OPEN = 'open'
+
+class UserSavedModes(ce.CommandEnum):
+    QUIT = 'quit'  # quit the mode
+    CONT = 'cont'  # continue viewing more search results
+    MORE = 'more'  # view summary info about a selected pdf
+    OPEN = 'open'  # open a file for viewing
 
     @classmethod
-    def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserViewModes:
+    def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserSavedModes:
         super().execute_params(params, save_query)
         cmd, params = params[0], params[1:]
 
-        if cmd == UserViewModes.MORE:
+        if cmd == UserSavedModes.MORE:
             selected_id = ce.is_list_of_n_ints(params, 1)[0]
             if not save_query.is_valid_id(selected_id):
                 raise ValueError(f'selected id {selected_id} is not a valid id')
             print(save_query.get_result(selected_id))
-            return UserViewModes.MORE
+            return UserSavedModes.MORE
 
-        elif cmd == UserViewModes.CONT:
+        elif cmd == UserSavedModes.CONT:
             ce.is_list_of_n_ints(params, 0)
-            return UserViewModes.CONT
+            return UserSavedModes.CONT
 
-        elif cmd == UserViewModes.QUIT:
+        elif cmd == UserSavedModes.QUIT:
             ce.is_list_of_n_ints(params, 0)
-            return UserViewModes.QUIT
+            return UserSavedModes.QUIT
 
         else:
             selected_id = ce.is_list_of_n_ints(params, 1)[0]
@@ -39,7 +41,7 @@ class UserViewModes(ce.CommandEnum):
                 raise ValueError(f'selected id {selected_id} is not a valid id')
             else:
                 pu.open_pdf(save_query.get_result(selected_id).pdf_path)
-            return UserViewModes.OPEN
+            return UserSavedModes.OPEN
 
 
 def view_mode():
@@ -62,11 +64,11 @@ def view_mode():
 
         while True:
             results_response = sr.split_and_format_string(input('waiting...\n'))
-            cmd = UserViewModes.execute_params(results_response, save_query)
+            cmd = UserSavedModes.execute_params(results_response, save_query)
 
-            if cmd == UserViewModes.CONT:
+            if cmd == UserSavedModes.CONT:
                 break
-            elif cmd == UserViewModes.QUIT:
+            elif cmd == UserSavedModes.QUIT:
                 time_to_quit = True
                 break
 

@@ -4,7 +4,7 @@ import src.utility.search_result as sr
 import psycopg2 as psy
 import src.api.retrieve_paper as rp
 import src.api.retrieve_biblio as rb
-import src.database.db_insert as dbi
+import src.database.insert as dbi
 import src.pdf_utils as pu
 
 

@@ -5,13 +5,15 @@ import src.api.retrieve_paper as rp
 import src.utility.save_query as sq
 import src.utility.command_enum as ce
 
+"""Mode for searching for and saving papers from arXiv."""
+
 
 class UserSearchResponses(ce.CommandEnum):
-    MORE = 'more'
-    CONT = 'cont'
-    VIEW = 'view'
-    ADD = 'add'
-    QUIT = 'quit'
+    MORE = 'more'  # view summary info selected paper
+    CONT = 'cont'  # continue seeing new search results
+    VIEW = 'view'  # what files have been added to the query of files to saved
+    ADD = 'add'  # add paper to query to be saved
+    QUIT = 'quit'  # quit this mode
 
     @classmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserSearchResponses:
@@ -28,7 +30,7 @@ class UserSearchResponses(ce.CommandEnum):
 
         elif cmd == UserSearchResponses.ADD:
             for param in params:
-                save_query.select_id(param)
+                save_query.select_id(int(param))
             save_query.command_enum.is_list_of_n_ints(params)
             return UserSearchResponses.ADD
 

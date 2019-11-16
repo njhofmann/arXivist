@@ -1,6 +1,7 @@
 Major
 -refactor existing codebase
 -add docs to existing codebase
+-separate out IO from logic
 -expand upon existing features for each mode
   -keyword args for search
   -removal of added papers
@@ -13,6 +14,7 @@ Minor
 -handling versioning
 -different pdf utilities per operating system
 -config file for database info
+-add papers from non-arxiv sources
 -database creation file
 -make query searchs all be lowercase
 -more advanced arg parser

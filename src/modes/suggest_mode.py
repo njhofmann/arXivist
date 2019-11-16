@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List
-from database import db_retrieve as dbr
+from database import retrieve as dbr
 import psycopg2 as psy
 import src.api.retrieve_paper as rp
 import src.utility.save_query as sq

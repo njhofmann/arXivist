@@ -1,26 +1,30 @@
 from __future__ import annotations
 from typing import List
-from modes import search_mode as se, view_mode as ve, suggest_mode as sm
+from modes import search_mode as se, saved_mode as ve, suggest_mode as sm
 import src.utility.save_query as sq
 import src.utility.command_enum as ce
 import sys
 
+"""Main entry point for the arXives shell. Displays set of supported "modes" (search, viewing, suggestion, etc.) user
+can select from."""
+
 
 class UserOptions(ce.CommandEnum):
-    SEARCH = 'search'
-    SUGGEST = 'suggest'
-    VIEW = 'view'
-    EXIT = 'exit'
+    """Set of supported "modes" mapped to allocated keywords for calling."""
+    SEARCH = 'search'  # search for papers
+    SUGGEST = 'suggest'  # suggest papers based on gathered citations
+    SAVED = 'saved'  # view previously saved papers
+    EXIT = 'exit'  # exit the shell
 
     @classmethod
     def execute_params(cls, params: List[str], search_query: sq.SaveQuery = None) -> UserOptions:
         if not params or len(params) > 1:
-            raise ValueError(f'UserOptions only requires one param')
+            raise ValueError(f'only require command name to select a mode')
 
         mode = params[0]
-        if mode == UserOptions.VIEW:
+        if mode == UserOptions.SAVED:
             ve.view_mode()
-            return UserOptions.VIEW
+            return UserOptions.SAVED
         elif mode == UserOptions.SEARCH:
             se.search_mode()
             return UserOptions.SEARCH
@@ -33,14 +37,23 @@ class UserOptions(ce.CommandEnum):
             raise ValueError(f'{mode} is not a supported mode')
 
 
-def main():
+def main(sys_mode: str) -> None:
+    if sys_mode not in ('prod', 'dev'):
+        raise ValueError(f'{sys_mode} is an unsupported system mode')
+
     while True:
         try:
             user_mode = input(f"available modes are {UserOptions.values_as_str()}\n").split(' ')
             UserOptions.execute_params(user_mode)
-        except Exception as e:
-            raise e
+        except Exception as e:  # print if prod else raise error
+            if sys_mode == 'prod':
+                print(e)
+            else:
+                raise e
 
 
 if __name__ == '__main__':
-    main()
+    args = sys.argv[1:]
+    if len(args) != 1:
+        raise ValueError('require only one argument to select mode shell runs in')
+    main(args[0])
