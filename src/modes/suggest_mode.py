@@ -6,13 +6,16 @@ import src.api.retrieve_paper as rp
 import src.utility.save_query as sq
 import src.utility.command_enum as ce
 
+"""Module for suggesting new papers to a user based on previously saved papers."""
+
 
 class UserSuggestOptions(ce.CommandEnum):
-    ADD = 'add'
-    CONT = 'cont'
-    QUIT = 'quit'
-    MORE = 'more'
-    VIEW = 'view'
+    ADD = 'add'  # to add papers to the query of papers to retrieve
+    CONT = 'cont'  # to view more results
+    QUIT = 'quit'  # to quit viewing this mode
+    MORE = 'more'  # to view more information about a previously displayed paper
+    VIEW = 'view'  # to view what papers have been added to the queue of papers to save
+    HELP = 'help'  # to view what each option does
 
     @classmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserSuggestOptions:
@@ -41,6 +44,16 @@ class UserSuggestOptions(ce.CommandEnum):
             save_query.submit()
             return UserSuggestOptions.QUIT
 
+        elif cmd == UserSuggestOptions.HELP:
+            ce.is_list_of_n_ints(params, 0)
+            print("\noptions:\n"
+                  "- 'more id' to view more info about a paper\n"
+                  "- 'cont' to view more results\n"
+                  "- 'add ids' to add results\n"
+                  "- 'view' to see what papers will be saved\n"
+                  "- 'quit' to terminate viewing suggestions, save any papers in the save queue")
+            return UserSuggestOptions.HELP
+
         else:  # must be view
             save_query.command_enum.is_list_of_n_ints(params, 0)
             print(save_query)
@@ -48,14 +61,13 @@ class UserSuggestOptions(ce.CommandEnum):
 
 
 def suggest_mode():
-
     with psy.connect(dbname='arxiv') as conn:
         with conn.cursor() as cursor:
             suggestion_ids = dbr.get_suggestions(cursor)
 
     search_query = rp.SearchQuery(id_params=suggestion_ids)
     results = search_query.retrieve_search_results()
-    
+
     save_query = sq.SaveQuery()
     for response in results:
         time_to_quit = False
@@ -63,11 +75,7 @@ def suggest_mode():
             save_query.add_valid_id(idx, result)
             print(idx, result.title)
 
-        print("\noptions:\n"
-              "- 'more id' to view more info\n"
-              "- 'cont' to view more results\n"
-              "- 'add ids' to add results\n"
-              "- 'quit' to terminate viewing save selections")
+        print('entered suggest mode\n')
 
         wait_on_user = True
         while wait_on_user:
@@ -83,5 +91,3 @@ def suggest_mode():
 
         if time_to_quit:
             break
-
-

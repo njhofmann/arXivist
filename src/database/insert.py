@@ -2,7 +2,6 @@ from psycopg2 import sql
 from utility import search_result as u
 from typing import Dict, List
 import pathlib as pl
-from utility import SearchResult
 
 
 def get_generic_insertion(cursor, table: str, column_to_value: Dict[str, str]) -> None:

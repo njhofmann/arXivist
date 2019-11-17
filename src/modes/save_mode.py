@@ -14,6 +14,7 @@ class UserSavedModes(ce.CommandEnum):
     CONT = 'cont'  # continue viewing more search results
     MORE = 'more'  # view summary info about a selected pdf
     OPEN = 'open'  # open a file for viewing
+    HELP = 'help'  # view what each option does
 
     @classmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserSavedModes:
@@ -35,6 +36,15 @@ class UserSavedModes(ce.CommandEnum):
             ce.is_list_of_n_ints(params, 0)
             return UserSavedModes.QUIT
 
+        elif cmd == UserSavedModes.HELP:
+            ce.is_list_of_n_ints(params, 0)
+            print("\noptions:\n"
+                  "- 'more id' to view more info\n"
+                  "- 'cont' to view more results\n"
+                  "- 'open id' to open current selected paper\n"
+                  "- 'quit' to terminate viewing\n")
+            return UserSavedModes.HELP
+
         else:
             selected_id = ce.is_list_of_n_ints(params, 1)[0]
             if not save_query.is_valid_id(selected_id):
@@ -44,7 +54,7 @@ class UserSavedModes(ce.CommandEnum):
             return UserSavedModes.OPEN
 
 
-def view_mode():
+def save_mode():
     search_params = sr.split_and_format_string(input('enter search params\n'))
     db_query = dbr.DatabaseQuery.from_params(search_params)
     results = db_query.get_results()
@@ -56,11 +66,7 @@ def view_mode():
             save_query.add_valid_id(idx, result)
             print(idx, result.title)
 
-        print("\noptions:\n"
-              "- 'more id' to view more info\n"
-              "- 'cont' to view more results\n"
-              "- 'open id' to open current selected paper\n"
-              "- 'quit' to terminate viewing\n")
+        print('save mode entered\n')
 
         while True:
             results_response = sr.split_and_format_string(input('waiting...\n'))

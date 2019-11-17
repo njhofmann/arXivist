@@ -1,6 +1,5 @@
 Major
 -refactor existing codebase
-  -generalized command -> function??
 -add docs to existing codebase
 -separate out IO from logic
 -expand upon existing features for each mode
@@ -11,13 +10,12 @@ Major
 
 Minor
 -separate out io for testing and prod
+-removal options
+-keyword args
 -clear previously displayed text
-
 -handling versioning
 -different pdf utilities per operating system
   -option to config
--config file for database info
 -add papers from non-arxiv sources
--database creation file
 -more advanced arg parser
   -

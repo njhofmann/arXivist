@@ -2,7 +2,7 @@ import requests as r
 from typing import Iterable, List, Tuple
 import itertools as i
 import xml.etree as xe
-from utility import search_result as u
+import src.utility.search_result as sr
 import xml.etree.ElementTree as xee
 import src.utility.base_query as bq
 
@@ -40,7 +40,7 @@ class SearchQuery(bq.BaseQuery):
     def get_xml_tree(self, text: str) -> xe.ElementTree:
         return xe.ElementTree.fromstring(text)
 
-    def retrieve_search_results(self) -> List[Tuple[int, u.SearchResult]]:
+    def retrieve_search_results(self) -> List[Tuple[int, sr.SearchResult]]:
         response = self.get_response_with_starting_query()
         if response.ok:  # ok, begin recursive parsing
             root = self.get_xml_tree(response.text)
@@ -48,7 +48,7 @@ class SearchQuery(bq.BaseQuery):
             return self.retrieve_valid_search_results(self.start, self.max_result, total_results)
         return self.parse_error(response.text)
 
-    def retrieve_valid_search_results(self, start: int, space: int, end: int) -> List[Tuple[int, u.SearchResult]]:
+    def retrieve_valid_search_results(self, start: int, space: int, end: int) -> List[Tuple[int, sr.SearchResult]]:
         count = 0
         while True:
             search_results = self.parse_valid_response(self.get_response_with_limited_query(start, space).text)
@@ -74,7 +74,7 @@ class SearchQuery(bq.BaseQuery):
     def get_open_search_child(self, parent: xee.Element, tag: str) -> xee.Element:
         return parent.find(self.XML_OPEN_SEARCH_ROOT + tag)
 
-    def parse_valid_response(self, xml_response: str) -> List[u.SearchResult]:
+    def parse_valid_response(self, xml_response: str) -> List[sr.SearchResult]:
         root = self.get_xml_tree(xml_response)
         entries = self.get_atom_children(root, 'entry')
         parsed_entries = []
@@ -100,7 +100,7 @@ class SearchQuery(bq.BaseQuery):
 
             authors = [self.get_atom_child(author, 'name').text for author in self.get_atom_children(entry, 'author')]
 
-            parsed_entries.append(u.SearchResult(title=title, id=arxiv_id, abstract=abstract, authors=authors,
+            parsed_entries.append(sr.SearchResult(title=title, id=arxiv_id, abstract=abstract, authors=authors,
                                                  pdf_url=pdf_link, publish=date))
         return parsed_entries
 

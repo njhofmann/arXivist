@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List
-from modes import search_mode as se, saved_mode as ve, suggest_mode as sm
+from modes import search_mode as se, save_mode as ve, suggest_mode as sm
 import src.utility.save_query as sq
 import src.utility.command_enum as ce
 import sys
@@ -23,7 +23,7 @@ class UserOptions(ce.CommandEnum):
 
         mode = params[0]
         if mode == UserOptions.SAVED:
-            ve.view_mode()
+            ve.save_mode()
             return UserOptions.SAVED
         elif mode == UserOptions.SEARCH:
             se.search_mode()

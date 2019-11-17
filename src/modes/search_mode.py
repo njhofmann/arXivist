@@ -14,6 +14,7 @@ class UserSearchResponses(ce.CommandEnum):
     VIEW = 'view'  # what files have been added to the query of files to saved
     ADD = 'add'  # add paper to query to be saved
     QUIT = 'quit'  # quit this mode
+    HELP = 'help'  # view what each option does
 
     @classmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserSearchResponses:
@@ -43,6 +44,16 @@ class UserSearchResponses(ce.CommandEnum):
             save_query.command_enum.is_list_of_n_ints(params, 0)
             return UserSearchResponses.QUIT
 
+        elif cmd == UserSearchResponses.HELP:
+            ce.is_list_of_n_ints(params, 0)
+            print("\noptions:\n"
+                  "- 'more id' to view more info\n"
+                  "- 'cont' to view more results\n"
+                  "- 'add ids' to add results to save query\n"
+                  "- 'view' to view current save query\n"
+                  "- 'quit' to terminate responses and submit save query")
+            return UserSearchResponses.HELP
+
         else:
             save_query.command_enum.is_list_of_n_ints(params, 0)
             print(save_query)
@@ -70,12 +81,7 @@ def search_mode():
             save_query.add_valid_id(result_id, response)
             print(result_id, title)
 
-        print("\noptions:\n"
-              "- 'more id' to view more info\n"
-              "- 'cont' to view more results\n"
-              "- 'add ids' to add results to save query\n"
-              "- 'view' to view current save query\n"
-              "- 'quit' to terminate responses and submit save query")
+        print('search mode entered\n')
 
         while True:
             results_response = sr.split_and_format_string(input('waiting...\n'))
