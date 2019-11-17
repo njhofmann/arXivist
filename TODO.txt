@@ -9,14 +9,14 @@ Major
 -biorxiv, add any research paper from article
 
 Minor
--clear previously displayed text
 -separate out io for testing and prod
+-clear previously displayed text
+
 -handling versioning
 -different pdf utilities per operating system
+  -option to config
 -config file for database info
 -add papers from non-arxiv sources
 -database creation file
--make query searchs all be lowercase
 -more advanced arg parser
-  -options for all
   -

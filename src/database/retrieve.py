@@ -12,12 +12,14 @@ class DatabaseQuery(bq.BaseQuery):
                  max_result: int = 10, start: int = 0) -> None:
         super().__init__(title_params=title_params, author_params=author_params, abstract_params=abstract_params,
                          id_params=id_params, max_result=max_result, start=start)
-
-    def format_params(self, params: Iterable[str]) -> str:
-        formatted_params = [f'{{}} LIKE \'%{param}%\'' for param in params]
+        
+    @staticmethod
+    def format_params(params: Iterable[str]) -> str:
+        formatted_params = [f'LOWER({{}}) LIKE \'%{param.lower()}%\'' for param in params]
         return ' AND '.join(formatted_params)
-
-    def n_column_identifiers(self, table: str, column: str, n: int) -> List[sql.Identifier]:
+    
+    @staticmethod
+    def n_column_identifiers(table: str, column: str, n: int) -> List[sql.Identifier]:
         if n < 1:
             return []
         return [sql.Identifier(table, column) for _ in range(n)]
@@ -36,10 +38,12 @@ class DatabaseQuery(bq.BaseQuery):
             columns_to_identifiers[column] = self.n_column_identifiers(table, column, n)
 
         base_query = 'SELECT {}, {}, {}, {}, {} FROM {} {} JOIN {} {} ON {} = {}'
-        base_identifiers = [sql.Identifier('pi', 'arxiv_id'), sql.Identifier('pi', 'title'), sql.Identifier('pi', 'abstract'),
-            sql.Identifier('pi', 'pdf_path'), sql.Identifier('pa', 'author'), sql.Identifier('paper_info'),
-            sql.Identifier('pi'), sql.Identifier('paper_author'), sql.Identifier('pa'),
-            sql.Identifier('pi', 'arxiv_id'), sql.Identifier('pa', 'arxiv_id')]
+        base_identifiers = [sql.Identifier('pi', 'arxiv_id'), sql.Identifier('pi', 'title'),
+                            sql.Identifier('pi', 'abstract'),
+                            sql.Identifier('pi', 'pdf_path'), sql.Identifier('pa', 'author'),
+                            sql.Identifier('paper_info'),
+                            sql.Identifier('pi'), sql.Identifier('paper_author'), sql.Identifier('pa'),
+                            sql.Identifier('pi', 'arxiv_id'), sql.Identifier('pa', 'arxiv_id')]
 
         formatted_params = ''
         for column, identifiers in columns_to_identifiers.items():
@@ -61,7 +65,7 @@ class DatabaseQuery(bq.BaseQuery):
                 search_results.get(arxiv_id).add_author(author)
             else:
                 search_results[arxiv_id] = sr.SearchResult(title=title, pdf_path=pdf_path, abstract=abstract,
-                                                          authors=[author], id=arxiv_id)
+                                                           authors=[author], id=arxiv_id)
         return list(search_results.values())
 
     def get_results(self) -> List[Tuple[int, sr.SearchResult]]:

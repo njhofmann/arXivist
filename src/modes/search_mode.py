@@ -77,7 +77,6 @@ def search_mode():
               "- 'view' to view current save query\n"
               "- 'quit' to terminate responses and submit save query")
 
-        wait_on_user = True
         while True:
             results_response = sr.split_and_format_string(input('waiting...\n'))
             cmd, params = UserSearchResponses.execute_params(results_response, save_query)
