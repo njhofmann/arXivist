@@ -1,5 +1,5 @@
 import requests as r
-import utility as u
+from utility import search_result as u
 from typing import List
 import json as j
 import re

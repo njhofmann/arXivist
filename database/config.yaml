@@ -1,0 +1,3 @@
+DATABASE = 'arxives'
+USER = 'postgres'
+PASSWORD = 'postgres'

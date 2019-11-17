@@ -1,5 +1,5 @@
 from psycopg2 import sql
-import utility as u
+from utility import search_result as u
 from typing import Dict, List
 import pathlib as pl
 from utility import SearchResult
@@ -36,10 +36,10 @@ def insert_search_query(cursor, search_query: u.SearchResult, references: List[s
         insert_paper_author(cursor, search_query.id, author)
 
     for reference in references:
-        insert_paper_references(cursor, search_query.id, reference)
+        insert_citations(cursor, search_query.id, reference)
 
 
-def insert_paper_references(cursor, paper_id: str, reference: str) -> None:
+def insert_citations(cursor, paper_id: str, reference: str) -> None:
     columns_to_values = {'child_id': paper_id, 'parent_id': reference}
     get_generic_insertion(cursor, 'citation_graph', columns_to_values)
 

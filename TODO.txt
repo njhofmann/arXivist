@@ -2,22 +2,22 @@ Major
 -refactor existing codebase
   -generalized command -> function??
 -add docs to existing codebase
+-separate out IO from logic
 -expand upon existing features for each mode
   -keyword args for search
   -removal of added papers
 -steps to publish as library or fully fledged app
--biorxiv
+-biorxiv, add any research paper from article
 
 Minor
--fixed display issue for viewing retrieved papers
--all option for search queries
--clear previously displayed text
 -separate out io for testing and prod
+-clear previously displayed text
+
+-handling versioning
 -different pdf utilities per operating system
+  -option to config
 -config file for database info
+-add papers from non-arxiv sources
 -database creation file
--make query searchs all be lowercase
--catch arg parser exceptions / override it
 -more advanced arg parser
-  -options for all
   -

@@ -1,13 +1,13 @@
 import requests as r
 from typing import Iterable, List, Tuple
 import itertools as i
-import dataclasses as dc
 import xml.etree as xe
-import utility as u
+from utility import search_result as u
 import xml.etree.ElementTree as xee
+import src.utility.base_query as bq
 
 
-class SearchQuery(u.BaseQuery):
+class SearchQuery(bq.BaseQuery):
     BASE_QUERY_URL = 'http://export.arxiv.org/api/query/?'
     BASE_ARXIV_URL = 'http://arxiv.org/abs/'
     XML_ATOM_ROOT = '{http://www.w3.org/2005/Atom}'
