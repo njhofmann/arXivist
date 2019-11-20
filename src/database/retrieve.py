@@ -4,6 +4,8 @@ from typing import List, Tuple, Iterable, Dict
 import src.utility.search_result as sr
 import src.utility.base_query as bq
 
+"""Module containing classes and functions relating to retrieving data from the database"""
+
 
 class DatabaseQuery(bq.BaseQuery):
 

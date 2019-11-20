@@ -4,6 +4,9 @@ from typing import Dict, List
 import pathlib as pl
 
 
+"""Module containing functionality for inserting data into the database"""
+
+
 def get_generic_insertion(cursor, table: str, column_to_value: Dict[str, str]) -> None:
     blank_columns = ', '.join(['{}' for _ in column_to_value])
     blank_values = ', '.join(['%s' for _ in column_to_value])

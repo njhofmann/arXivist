@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import List
 import src.utility.search_result as sr
 import src.api.retrieve_paper as rp
+import src.database.remove as rm
 import src.utility.save_query as sq
 import src.utility.command_enum as ce
 
@@ -15,6 +16,7 @@ class UserSearchResponses(ce.CommandEnum):
     ADD = 'add'  # add paper to query to be saved
     QUIT = 'quit'  # quit this mode
     HELP = 'help'  # view what each option does
+    DEL = 'del'  # removes paper and associated data
 
     @classmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserSearchResponses:
@@ -41,8 +43,16 @@ class UserSearchResponses(ce.CommandEnum):
 
         elif cmd == UserSearchResponses.QUIT:
             save_query.submit()
-            save_query.command_enum.is_list_of_n_ints(params, 0)
+            ce.is_list_of_n_ints(params, 0)
             return UserSearchResponses.QUIT
+
+        elif cmd == UserSearchResponses.DEL:
+            paper_idx = ce.is_list_of_n_ints(params, 1)[0]
+            if not save_query.is_valid_id(paper_idx):
+                raise ValueError(f'invalid id {paper_idx}')
+            paper_id = save_query.get_result(paper_idx).id
+            rm.remove_paper(paper_id)
+            return UserSearchResponses.DEL
 
         elif cmd == UserSearchResponses.HELP:
             ce.is_list_of_n_ints(params, 0)

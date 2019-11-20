@@ -9,9 +9,18 @@ Major
 -biorxiv, add any research paper from article
 
 Minor
+-program start, load database enums as environmental variables
+  -separate files
+  -constants for important names, after loaded into environ, getter functions
 -separate out io for testing and prod
 -removal options
+  -remove keyword
+  -remove entry
+-
 -keyword args
+  -add keyword args to existing
+  -add keyword args before saving
+  -redo queries
 -clear previously displayed text
 -handling versioning
 -different pdf utilities per operating system
