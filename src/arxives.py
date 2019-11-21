@@ -3,16 +3,15 @@ from typing import List
 from modes import search_mode as se, save_mode as ve, suggest_mode as sm
 import src.utility.save_query as sq
 import src.utility.command_enum as ce
-import database.db_init as dc
-import os
+import src.load_db_info as ldb
 import pathlib as pl
 import sys
 
 """Main entry point for the arXives shell. Displays set of supported "modes" (search, viewing, suggestion, etc.) user
 can select from."""
 
-
 CONFIG_PATH = pl.Path('.').parent.parent.joinpath('database').joinpath('config.yaml').resolve()
+
 
 class UserOptions(ce.CommandEnum):
     """Set of supported "modes" mapped to allocated keywords for calling."""
@@ -42,17 +41,12 @@ class UserOptions(ce.CommandEnum):
             raise ValueError(f'{mode} is not a supported mode')
 
 
-def load_db_info(config_path: pl.Path) -> None:
-    database_config = dc.open_config(config_path)
-    os.environ['db_name']
-
-
 def main(sys_mode: str) -> None:
     if sys_mode not in ('prod', 'dev'):
         raise ValueError(f'{sys_mode} is an unsupported system mode')
 
     # initalize db variables
-    load_db_info(CONFIG_PATH)
+    ldb.load_db_info(CONFIG_PATH)
 
     while True:
         try:
