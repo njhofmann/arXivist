@@ -16,7 +16,6 @@ class UserSearchResponses(ce.CommandEnum):
     ADD = 'add'  # add paper to query to be saved
     QUIT = 'quit'  # quit this mode
     HELP = 'help'  # view what each option does
-    DEL = 'del'  # removes paper and associated data
 
     @classmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserSearchResponses:
@@ -46,19 +45,11 @@ class UserSearchResponses(ce.CommandEnum):
             ce.is_list_of_n_ints(params, 0)
             return UserSearchResponses.QUIT
 
-        elif cmd == UserSearchResponses.DEL:
-            paper_idx = ce.is_list_of_n_ints(params, 1)[0]
-            if not save_query.is_valid_id(paper_idx):
-                raise ValueError(f'invalid id {paper_idx}')
-            paper_id = save_query.get_result(paper_idx).id
-            rm.remove_paper(paper_id)
-            return UserSearchResponses.DEL
-
         elif cmd == UserSearchResponses.HELP:
             ce.is_list_of_n_ints(params, 0)
             print("\noptions:\n"
-                  "- 'more id' to view more info\n"
-                  "- 'cont' to view more results\n"
+                  "- 'more id' to view more info about a resulting paper\n"
+                  "- 'cont' to view more search results\n"
                   "- 'add ids' to add results to save query\n"
                   "- 'view' to view current save query\n"
                   "- 'quit' to terminate responses and submit save query")

@@ -7,10 +7,10 @@ import dataclasses as dc
 
 @dc.dataclass
 class DatabaseConfig:
-    """Stores name of a database and database info (username and password)."""
+    """Stores name of a database and database info (username and password)"""
     db_name: str  # database name
-    user: str  # name to
-    password: str
+    user: str  # name to login to database system with
+    password: str  # password to login into the database system with
 
 
 def open_config(config_file: Union[str, pl.Path]) -> DatabaseConfig:
