@@ -1,4 +1,5 @@
 Major
+-set up docker integration
 -refactor existing codebase
 -add docs to existing codebase
 -separate out IO from logic
