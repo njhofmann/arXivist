@@ -5,12 +5,12 @@ from typing import List
 import src.utility.save_query as sq
 import src.database.remove as rm
 import src.pdf_utils as pu
-import src.utility.command_enum as ce
+import src.utility.cmd_enum as ce
 
 """Mode for viewing, removing, or editing previously saved entries."""
 
 
-class UserViewModes(ce.CommandEnum):
+class UserViewModes(ce.CmdEnum):
     QUIT = 'quit'  # quit the mode
     CONT = 'cont'  # continue viewing more search results
     MORE = 'more'  # view summary info about a selected pdf

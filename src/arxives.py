@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List
 from modes import search_mode as se, view_modes as ve, suggest_mode as sm
 import src.utility.save_query as sq
-import src.utility.command_enum as ce
+import src.utility.cmd_enum as ce
 import src.load_db_info as ldb
 import pathlib as pl
 import sys
@@ -10,10 +10,11 @@ import sys
 """Main entry point for the arXives shell. Displays set of supported "modes" (search, viewing, suggestion, etc.) user
 can select from."""
 
-CONFIG_PATH = pl.Path('.').parent.parent.joinpath('database').joinpath('config.yaml').resolve()
+CONFIG_PATH = pl.Path('.')
+CONFIG_PATH = pl.Path('.').parent.parent.joinpath('database/config.yaml').resolve()
 
 
-class UserOptions(ce.CommandEnum):
+class UserOptions(ce.CmdEnum):
     """Set of supported "modes" mapped to allocated keywords for calling."""
     SEARCH = 'search'  # search for papers
     SUGGEST = 'suggest'  # suggest papers based on gathered citations
@@ -45,7 +46,7 @@ def main(sys_mode: str) -> None:
     if sys_mode not in ('prod', 'dev'):
         raise ValueError(f'{sys_mode} is an unsupported system mode')
 
-    # initalize db variables
+    # initialize db variables
     ldb.load_db_info(CONFIG_PATH)
 
     while True:

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, List
+from typing import Any, List, Final
 import dataclasses as dc
 import pathlib as pl
 
@@ -33,7 +33,7 @@ class SearchResult:
         return hash(self.id)
 
     def __eq__(self, other: Any) -> bool:
-        return self.id == other
+        return isinstance(other, SearchResult) and self.id == other.id
 
     def add_author(self, author: str) -> None:
         if self.authors:

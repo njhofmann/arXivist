@@ -4,12 +4,12 @@ from database import retrieve as dbr
 import psycopg2 as psy
 import src.api.retrieve_paper as rp
 import src.utility.save_query as sq
-import src.utility.command_enum as ce
+import src.utility.cmd_enum as ce
 
 """Module for suggesting new papers to a user based on previously saved papers."""
 
 
-class UserSuggestOptions(ce.CommandEnum):
+class UserSuggestOptions(ce.CmdEnum):
     ADD = 'add'  # to add papers to the query of papers to retrieve
     CONT = 'cont'  # to view more results
     QUIT = 'quit'  # to quit viewing this mode

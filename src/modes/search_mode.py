@@ -4,12 +4,12 @@ import src.utility.search_result as sr
 import src.api.retrieve_paper as rp
 import src.database.remove as rm
 import src.utility.save_query as sq
-import src.utility.command_enum as ce
+import src.utility.cmd_enum as ce
 
 """Mode for searching for and saving papers from arXiv."""
 
 
-class UserSearchResponses(ce.CommandEnum):
+class UserSearchResponses(ce.CmdEnum):
     MORE = 'more'  # view summary info selected paper
     CONT = 'cont'  # continue seeing new search results
     VIEW = 'view'  # what files have been added to the query of files to saved

@@ -5,7 +5,7 @@ from typing import Any, List
 import src.utility.save_query as sq
 
 
-class CommandEnum(e.Enum):
+class CmdEnum(e.Enum):
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, type(self)):
             return self is other
@@ -23,7 +23,7 @@ class CommandEnum(e.Enum):
 
     @classmethod
     @abc.abstractmethod
-    def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> CommandEnum:
+    def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> CmdEnum:
         """
         Maps the relationship between each defined type of CommandEnum and associated operations. Given a list of
         parameters, a command and any relevant arguments, attempts to execute operations associated with command listed
