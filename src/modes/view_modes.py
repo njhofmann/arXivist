@@ -1,7 +1,8 @@
 from __future__ import annotations
+from typing import List
+
 import src.utility.search_result as sr
 import src.database.retrieve as dbr
-from typing import List
 import src.utility.save_query as sq
 import src.database.remove as rm
 import src.pdf_utils as pu
@@ -67,8 +68,7 @@ class UserViewModes(ce.CmdEnum):
             selected_id = ce.is_list_of_n_ints(params, 1)[0]
             if not save_query.is_valid_id(selected_id):
                 raise ValueError(f'selected id {selected_id} is not a valid id')
-            else:
-                pu.open_pdf(save_query.get_result(selected_id).pdf_path)
+            pu.open_pdf(save_query.get_result(selected_id).pdf_path)
             return UserViewModes.OPEN
 
 

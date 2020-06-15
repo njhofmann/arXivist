@@ -1,8 +1,16 @@
 from __future__ import annotations
 import abc
 import enum as e
-from typing import Any, List
+from typing import Any, List, Callable
+import dataclasses as dc
 import src.utility.save_query as sq
+
+
+@dc.dataclass(frozen=True)
+class CmdValue:
+    cmd: str
+    value: Callable[[], None]
+    help: str
 
 
 class CmdEnum(e.Enum):
@@ -22,7 +30,10 @@ class CmdEnum(e.Enum):
         return ', '.join(item.value for item in cls)
 
     @classmethod
-    @abc.abstractmethod
+    def display_available_options(cls: e.Enum) -> None:
+        print('available modes are ' + cls.values_as_str())
+
+    @classmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> CmdEnum:
         """Maps the relationship between each defined type of CommandEnum and associated operations. Given a list of
         parameters, a command and any relevant arguments, attempts to execute operations associated with command listed

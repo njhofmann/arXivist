@@ -31,10 +31,10 @@ class SearchQuery(bq.BaseQuery):
         elif id_params or formatted_params:
             self.query = self.BASE_QUERY_URL + (id_params if id_params else formatted_params)
 
-    def get_response_with_limited_query(self, start: int, space: int):
+    def get_response_with_limited_query(self, start: int, space: int) -> r.Response:
         return r.get(self.query + f'&start={start}&max_result={space}')
 
-    def get_response_with_starting_query(self):
+    def get_response_with_starting_query(self) -> r.Response:
         return self.get_response_with_limited_query(self.start, self.max_result)
 
     def get_xml_tree(self, text: str) -> xe.ElementTree:
@@ -101,7 +101,7 @@ class SearchQuery(bq.BaseQuery):
             authors = [self.get_atom_child(author, 'name').text for author in self.get_atom_children(entry, 'author')]
 
             parsed_entries.append(sr.SearchResult(title=title, id=arxiv_id, abstract=abstract, authors=authors,
-                                                 pdf_url=pdf_link, publish=date))
+                                                 pdf_url=pdf_link, publish=date, keywords=[]))
         return parsed_entries
 
     def parse_error(self, error_msg: str):
@@ -117,4 +117,4 @@ if __name__ == '__main__':
     url = SearchQuery(title_params=['learning', 'reinforcement', 'deep', 'replay'])
     print(url)
     results = url.retrieve_search_results()
-    print(results)
+    print(list(results))

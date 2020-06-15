@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import Set, Dict
-import src.utility.search_result as sr
 import psycopg2 as psy
+
+import src.utility.search_result as sr
 import src.api.retrieve_paper as rp
 import src.api.retrieve_biblio as rb
 import src.database.insert as dbi

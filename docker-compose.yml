@@ -3,23 +3,23 @@ version: "3.7"
 services:
   app:
     container_name: arxivist-python
-#    environment:
-#      - PYTHONUNBUFFERED=1
     stdin_open: true  # docker run -i
     tty: true # docker run -t
     build:
       context: .
       dockerfile: app.Dockerfile
-#    volumes:
-#      - ./:/usr/src/app/
+    volumes:
+      - ${HOST_SAVE_DIRC}:${CONTAINER_SAVE_DIRC}
     depends_on:
       - postgres
 
   postgres:
     container_name: arxivist-postgres
     image: 'postgres'
-    env_file:
-      - ./database/db.env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - 5433:5432
 #    volumes:

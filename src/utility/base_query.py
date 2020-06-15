@@ -43,5 +43,7 @@ class BaseQuery(abc.ABC):
     def from_params(cls: type, params: List[str]):
         parser = BaseQuery.get_parser()
         args = parser.parse_args(params)
-        return cls(title_params=args.title + args.all, id_params=args.arvix_id + args.all,
-                   abstract_params=args.abstract + args.all, author_params=args.author + args.all)
+        return cls(title_params=args.title + args.all,
+                   id_params=args.arvix_id + args.all,
+                   abstract_params=args.abstract + args.all,
+                   author_params=args.author + args.all)

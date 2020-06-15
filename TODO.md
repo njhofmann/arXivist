@@ -1,10 +1,13 @@
 * add docs to existing codebase
 * refactor existing codebase
+    * unified env file, pass to app container
+    * distinguish between program and user entries in console
+    * redo how command enums are done
+        * enum: name, callable, help
+        * all work done in CmdEnum
 * set up docker integration
-    * how does app connect to db
-    * set up volume for app, where to download pdfs
-    * set up volumes for db, load script and store data
-    * set up default pdf viewer
+    * set up volumes
+* fix search query, all option
 * separate out IO from logic
 * keyword args for search
 * removal options
@@ -15,9 +18,6 @@
 * keyword args
     * add keyword args to existing
     * add keyword args before saving
-* program start, load database enums as environmental variables
-    * separate files
-    * constants for important names, after loaded into environ, getter functions
 * add support for other pre-print repos
     * bioRxiv
     * chemRxiv

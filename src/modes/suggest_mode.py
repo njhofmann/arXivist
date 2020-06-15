@@ -1,10 +1,12 @@
 from __future__ import annotations
 from typing import List
-import src.database.retrieve as dbr
 import psycopg2 as psy
+
+import src.database.retrieve as dbr
 import src.api.retrieve_paper as rp
 import src.utility.save_query as sq
 import src.utility.cmd_enum as ce
+import src.db_init as dbi
 
 """Module for suggesting new papers to a user based on previously saved papers."""
 
@@ -23,24 +25,24 @@ class UserSuggestOptions(ce.CmdEnum):
         cmd, params = params[0], params[1:]
 
         if cmd == UserSuggestOptions.MORE:
-            selected_id = save_query.command_enum.is_list_of_n_ints(params, 1)[0]
+            selected_id = ce.is_list_of_n_ints(params, 1)[0]
             if not save_query.is_valid_id(selected_id):
                 raise ValueError(f'selected id {selected_id} is not a valid id')
             print(save_query.get_result(selected_id))
             return UserSuggestOptions.MORE
 
         elif cmd == UserSuggestOptions.ADD:
-            ids = save_query.command_enum.is_list_of_n_ints(params)
+            ids = ce.is_list_of_n_ints(params)
             for result_id in ids:
                 save_query.select_id(result_id)
             return UserSuggestOptions.ADD
 
         elif cmd == UserSuggestOptions.CONT:
-            save_query.command_enum.is_list_of_n_ints(params, 0)
+            ce.is_list_of_n_ints(params, 0)
             return UserSuggestOptions.CONT
 
         elif cmd == UserSuggestOptions.QUIT:
-            save_query.command_enum.is_list_of_n_ints(params, 0)
+            ce.is_list_of_n_ints(params, 0)
             save_query.submit()
             return UserSuggestOptions.QUIT
 
@@ -55,13 +57,13 @@ class UserSuggestOptions(ce.CmdEnum):
             return UserSuggestOptions.HELP
 
         else:  # must be view
-            save_query.command_enum.is_list_of_n_ints(params, 0)
+            ce.is_list_of_n_ints(params, 0)
             print(save_query)
             return UserSuggestOptions.VIEW
 
 
 def suggest_mode():
-    with psy.connect(dbname='arxiv') as conn:
+    with psy.connect(dbname=dbi.get_db_info().db_name) as conn:
         with conn.cursor() as cursor:
             suggestion_ids = dbr.get_suggestions(cursor)
 

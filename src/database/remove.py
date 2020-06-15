@@ -1,13 +1,14 @@
 from psycopg2 import sql
 import psycopg2 as psy
-import src.load_db_info as dbi
+import src.db_init as dbi
 from typing import Tuple, Union
 
 """Module containing functionalities relating to remove data from the database"""
 
 
 def generic_execution(query: sql.Composed, params: Tuple[Union[str, int], ...]) -> None:
-    with psy.connect(user=dbi.USERNAME, password=dbi.PASSWORD, dbname=dbi.DB_NAME) as conn:
+    db_info = dbi.get_db_info()
+    with psy.connect(user=db_info.user, password=db_info.password, dbname=db_info.db_name) as conn:
         with conn.cursor() as cursor:
             cursor.execute(query, params)
 

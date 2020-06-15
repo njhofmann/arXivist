@@ -4,6 +4,7 @@ import src.utility.search_result as sr
 import src.api.retrieve_paper as rp
 import src.utility.save_query as sq
 import src.utility.cmd_enum as ce
+import src.util as u
 
 """Mode for searching for and saving papers from arXiv."""
 
@@ -69,9 +70,12 @@ def format_params(params: List[str]) -> List[str]:
 
 
 def search_mode():
-    params = input('enter search params\n')
-    params = format_params(params.split(' '))
+    print('search mode entered')
+    params = format_params(u.get_user_input('enter search params').split(' '))
+
+    print('fetching results...')
     search_query = rp.SearchQuery.from_params(params)
+    print('results fetched')
 
     save_query = sq.SaveQuery()
     for responses in search_query.retrieve_search_results():
@@ -81,11 +85,10 @@ def search_mode():
             save_query.add_valid_id(result_id, response)
             print(result_id, title)
 
-        print('search mode entered\n')
-
         while True:
-            results_response = sr.split_and_format_string(input('waiting...\n'))
-            cmd, params = UserSearchResponses.execute_params(results_response, save_query)
+            user_response = u.get_user_input('')
+            results_response = sr.split_and_format_string(user_response)
+            cmd = UserSearchResponses.execute_params(results_response, save_query)
 
             if cmd == UserSearchResponses.CONT:
                 break
