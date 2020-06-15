@@ -1,6 +1,6 @@
 from __future__ import annotations
 import src.utility.search_result as sr
-from database import retrieve as dbr
+import src.database.retrieve as dbr
 from typing import List
 import src.utility.save_query as sq
 import src.database.remove as rm

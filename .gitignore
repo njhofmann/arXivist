@@ -105,3 +105,5 @@ venv.bak/
 
 .idea/
 pdfs/
+.run
+docker

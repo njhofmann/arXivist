@@ -1,5 +1,5 @@
 from psycopg2 import sql
-from utility import search_result as u
+import src.utility.search_result as u
 from typing import Dict, List
 import pathlib as pl
 

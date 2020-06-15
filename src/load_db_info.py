@@ -13,7 +13,7 @@ PASSWORD = 'password'
 
 
 def load_db_info(config_path: pl.Path) -> None:
-    database_config = dc.open_config(config_path)
+    database_config = dc.get_db_info(config_path)
     environ_to_config = [(DB_NAME, database_config.db_name), (USERNAME, database_config.user),
                          (PASSWORD, database_config.password)]
     for env, config in environ_to_config:

@@ -5,8 +5,7 @@ import pathlib as pl
 
 
 def split_and_format_string(to_format: str) -> List[str]:
-    """
-    Splits a string on any spaces in the string, removes any reuslting empty strings, and returns a list of the split
+    """Splits a string on any spaces in the string, removes any reuslting empty strings, and returns a list of the split
     string.
     :param to_format: string to format
     :return: split string

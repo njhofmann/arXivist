@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  app:
+    container_name: arxivist-python
+#    environment:
+#      - PYTHONUNBUFFERED=1
+    stdin_open: true  # docker run -i
+    tty: true # docker run -t
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+#    volumes:
+#      - ./:/usr/src/app/
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: arxivist-postgres
+    image: 'postgres'
+    env_file:
+      - ./database/db.env
+    ports:
+      - 5433:5432
+#    volumes:
+#      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+##      - postgres:/var/lib/postgresql/data

@@ -1,3 +1,7 @@
+CREATE USER postgres;
+CREATE DATABASE arxives;
+GRANT ALL PRIVILEGES ON DATABASE arxives TO postgres;
+
 CREATE TABLE paper_info (
     arxiv_id TEXT PRIMARY KEY,
     title TEXT,

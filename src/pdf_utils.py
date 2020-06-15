@@ -2,7 +2,7 @@ import requests as r
 import pathlib as pl
 import uuid
 import subprocess as sbp
-from utility import search_result as u
+import src.utility.search_result as u
 from typing import Union
 import sys
 

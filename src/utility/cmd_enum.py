@@ -24,8 +24,7 @@ class CmdEnum(e.Enum):
     @classmethod
     @abc.abstractmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> CmdEnum:
-        """
-        Maps the relationship between each defined type of CommandEnum and associated operations. Given a list of
+        """Maps the relationship between each defined type of CommandEnum and associated operations. Given a list of
         parameters, a command and any relevant arguments, attempts to execute operations associated with command listed
         in the params, should be the first item in the list - ie "cmd arg1 ... argn". Throws ValueError if unsupported
         command is given or if incorrect args are given. Returns the type of CommandEnum that was executed.
@@ -44,9 +43,6 @@ class CmdEnum(e.Enum):
 def is_list_of_n_ints(to_parse: List[str], n: int = -1) -> List[int]:
     if not to_parse:
         return []
-    elif n > -1 and len(to_parse) != n:  # -1 means variable length
+    elif -1 < n != len(to_parse):  # -1 means variable length
         raise ValueError(f'given list {to_parse} must have only {n} entries')
-
-    for idx, entry in enumerate(to_parse):
-        to_parse[idx] = int(entry)
-    return to_parse
+    return [int(item) for item in to_parse]

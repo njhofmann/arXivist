@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import List
 import src.utility.search_result as sr
 import src.api.retrieve_paper as rp
-import src.database.remove as rm
 import src.utility.save_query as sq
 import src.utility.cmd_enum as ce
 
@@ -24,7 +23,7 @@ class UserSearchResponses(ce.CmdEnum):
         cmd, params = params[0], params[1:]
 
         if cmd == UserSearchResponses.MORE:
-            selected_id = save_query.command_enum.is_list_of_n_ints(params, 1)[0]
+            selected_id = ce.is_list_of_n_ints(params, 1)[0]
             if not save_query.is_valid_id(selected_id):
                 raise ValueError(f'selected id {selected_id} is not a valid id')
             print(save_query.get_result(selected_id))
@@ -33,11 +32,11 @@ class UserSearchResponses(ce.CmdEnum):
         elif cmd == UserSearchResponses.ADD:
             for param in params:
                 save_query.select_id(int(param))
-            save_query.command_enum.is_list_of_n_ints(params)
+            ce.is_list_of_n_ints(params)
             return UserSearchResponses.ADD
 
         elif cmd == UserSearchResponses.CONT:
-            save_query.command_enum.is_list_of_n_ints(params, 0)
+            ce.is_list_of_n_ints(params, 0)
             return UserSearchResponses.CONT
 
         elif cmd == UserSearchResponses.QUIT:
@@ -56,14 +55,14 @@ class UserSearchResponses(ce.CmdEnum):
             return UserSearchResponses.HELP
 
         else:
-            save_query.command_enum.is_list_of_n_ints(params, 0)
+            ce.is_list_of_n_ints(params, 0)
             print(save_query)
             return UserSearchResponses.VIEW
 
 
 def format_params(params: List[str]) -> List[str]:
     for idx, param in enumerate(params):
-        for char in (' '):
+        for char in ' ':
             param = param.replace(char, '')
         params[idx] = param
     return list(filter(lambda x: bool(x), params))

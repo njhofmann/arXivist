@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import List
-from modes import search_mode as se, view_modes as ve, suggest_mode as sm
+import src.modes.search_mode as se
+import src.modes.view_modes as ve
+import src.modes.suggest_mode as sm
 import src.utility.save_query as sq
 import src.utility.cmd_enum as ce
 import src.load_db_info as ldb
@@ -10,8 +12,7 @@ import sys
 """Main entry point for the arXives shell. Displays set of supported "modes" (search, viewing, suggestion, etc.) user
 can select from."""
 
-CONFIG_PATH = pl.Path('.')
-CONFIG_PATH = pl.Path('.').parent.parent.joinpath('database/config.yaml').resolve()
+CONFIG_PATH = pl.Path('.').parent.parent.joinpath('database/db.env').resolve()
 
 
 class UserOptions(ce.CmdEnum):
