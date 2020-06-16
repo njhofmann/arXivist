@@ -18,10 +18,10 @@ class UserSearchResponses(ce.CmdEnum):
     HELP = 'help'  # view what each option does
 
     @classmethod
-    def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserSearchResponses:
-        super().execute_params(params, save_query)
+    def execute_params(cls, args: List[str], save_query: sq.SaveQuery = None) -> UserSearchResponses:
+        super().execute_params(args, save_query)
 
-        cmd, params = params[0], params[1:]
+        cmd, params = args[0], args[1:]
 
         if cmd == UserSearchResponses.MORE:
             selected_id = ce.is_list_of_n_ints(params, 1)[0]
@@ -86,6 +86,7 @@ def search_mode():
             print(result_id, title)
 
         while True:
+            UserSearchResponses.display_available_options()
             user_response = u.get_user_input('')
             results_response = sr.split_and_format_string(user_response)
             cmd = UserSearchResponses.execute_params(results_response, save_query)

@@ -1,12 +1,12 @@
-* add docs to existing codebase
 * refactor existing codebase
-    * unified env file, pass to app container
+    * unified env file
     * distinguish between program and user entries in console
+    * rework mode loops
     * redo how command enums are done
-        * enum: name, callable, help
-        * all work done in CmdEnum
 * set up docker integration
     * set up volumes
+    * postgres port
+    * port to web
 * fix search query, all option
 * separate out IO from logic
 * keyword args for search

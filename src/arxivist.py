@@ -27,31 +27,17 @@ SCHEMA_FILE = pl.Path(__file__).parent.parent.joinpath('init.sql')
 
 class UserOptions(ce.CmdEnum):
     """Set of supported "modes" mapped to allocated keywords for calling."""
-    SEARCH = 'search'  # search for papers
-    SUGGEST = 'suggest'  # suggest papers based on gathered citations
-    SAVED = 'saved'  # view previously saved papers
-    EXIT = 'exit'  # exit the shell
+    SEARCH = ce.Command('search', lambda x: se.search_mode(), 'search for papers')
+    SUGGEST = ce.Command('suggest', lambda x: sm.suggest_mode(), 'suggested papers based on gathered citations')
+    SAVED = ce.Command('saved', lambda x: ve.view_mode(), 'view previously saved papers')
+    EXIT = ce.Command('exit', lambda x: sys.exit(), 'exit the program')
+    HELP = ce.Command('help', lambda x: UserOptions.display_help_options(), 'what each mode does')
 
     @classmethod
     def execute_params(cls, params: List[str], search_query: sq.SaveQuery = None) -> UserOptions:
-        super().execute_params(params, search_query)
+        return super().execute_params(params, search_query)
         if not params or len(params) > 1:
             raise ValueError(f'only require command name to select a mode')
-
-        mode = params[0]
-        if mode == UserOptions.SAVED:
-            ve.view_mode()
-            return UserOptions.SAVED
-        elif mode == UserOptions.SEARCH:
-            se.search_mode()
-            return UserOptions.SEARCH
-        elif mode == UserOptions.SUGGEST:
-            sm.suggest_mode()
-            return UserOptions.SUGGEST
-        elif mode == UserOptions.EXIT:
-            sys.exit()
-        else:
-            raise ValueError(f'{mode} is not a supported mode')
 
 
 def main(sys_mode: str) -> None:
