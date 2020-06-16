@@ -9,56 +9,49 @@ import src.util as u
 """Mode for searching for and saving papers from arXiv."""
 
 
+def more_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    selected_id = ce.is_list_of_n_ints(args, 1)[0]
+    if not save_query.is_valid_id(selected_id):
+        raise ValueError(f'selected id {selected_id} is not a valid id')
+    print(save_query.get_result(selected_id))
+
+
+def add_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    for param in args:
+        save_query.select_id(int(param))
+    ce.is_list_of_n_ints(args)
+
+
+def cont_cmd_func(params: List[str], save_query: sq.SaveQuery) -> None:
+    ce.is_list_of_n_ints(params, 0)
+
+
+def quit_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    save_query.submit()
+    ce.is_list_of_n_ints(args, 0)
+
+
+def view_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    ce.is_list_of_n_ints(args, 0)
+    print(save_query)
+
+
+def help_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    ce.is_list_of_n_ints(args, 0)
+    UserSearchResponses.display_help_options()
+
+
 class UserSearchResponses(ce.CmdEnum):
-    MORE = 'more'  # view summary info selected paper
-    CONT = 'cont'  # continue seeing new search results
-    VIEW = 'view'  # what files have been added to the query of files to saved
-    ADD = 'add'  # add paper to query to be saved
-    QUIT = 'quit'  # quit this mode
-    HELP = 'help'  # view what each option does
+    MORE = ce.Command('more', more_cmd_func, 'view summary info selected paper')
+    CONT = ce.Command('cont', cont_cmd_func, 'continue seeing new search results')
+    VIEW = ce.Command('view', view_cmd_func, 'what files have been added to the query of files to saved')
+    ADD = ce.Command('add', add_cmd_func, 'add paper to query to be saved')
+    QUIT = ce.Command('quit', quit_cmd_func, 'quit this mode')
+    HELP = ce.Command('help', help_cmd_func, 'view what each option does')
 
     @classmethod
     def execute_params(cls, args: List[str], save_query: sq.SaveQuery = None) -> UserSearchResponses:
-        super().execute_params(args, save_query)
-
-        cmd, params = args[0], args[1:]
-
-        if cmd == UserSearchResponses.MORE:
-            selected_id = ce.is_list_of_n_ints(params, 1)[0]
-            if not save_query.is_valid_id(selected_id):
-                raise ValueError(f'selected id {selected_id} is not a valid id')
-            print(save_query.get_result(selected_id))
-            return UserSearchResponses.MORE
-
-        elif cmd == UserSearchResponses.ADD:
-            for param in params:
-                save_query.select_id(int(param))
-            ce.is_list_of_n_ints(params)
-            return UserSearchResponses.ADD
-
-        elif cmd == UserSearchResponses.CONT:
-            ce.is_list_of_n_ints(params, 0)
-            return UserSearchResponses.CONT
-
-        elif cmd == UserSearchResponses.QUIT:
-            save_query.submit()
-            ce.is_list_of_n_ints(params, 0)
-            return UserSearchResponses.QUIT
-
-        elif cmd == UserSearchResponses.HELP:
-            ce.is_list_of_n_ints(params, 0)
-            print("\noptions:\n"
-                  "- 'more id' to view more info about a resulting paper\n"
-                  "- 'cont' to view more search results\n"
-                  "- 'add ids' to add results to save query\n"
-                  "- 'view' to view current save query\n"
-                  "- 'quit' to terminate responses and submit save query")
-            return UserSearchResponses.HELP
-
-        else:
-            ce.is_list_of_n_ints(params, 0)
-            print(save_query)
-            return UserSearchResponses.VIEW
+        return UserSearchResponses(super().execute_params_with_checks(args, save_query))
 
 
 def format_params(params: List[str]) -> List[str]:

@@ -27,24 +27,27 @@ SCHEMA_FILE = pl.Path(__file__).parent.parent.joinpath('init.sql')
 
 class UserOptions(ce.CmdEnum):
     """Set of supported "modes" mapped to allocated keywords for calling."""
-    SEARCH = ce.Command('search', lambda x: se.search_mode(), 'search for papers')
-    SUGGEST = ce.Command('suggest', lambda x: sm.suggest_mode(), 'suggested papers based on gathered citations')
-    SAVED = ce.Command('saved', lambda x: ve.view_mode(), 'view previously saved papers')
-    EXIT = ce.Command('exit', lambda x: sys.exit(), 'exit the program')
-    HELP = ce.Command('help', lambda x: UserOptions.display_help_options(), 'what each mode does')
+    SEARCH = ce.Command('search', lambda x, y : se.search_mode(), 'search for papers')
+    SUGGEST = ce.Command('suggest', lambda x, y: sm.suggest_mode(), 'suggested papers based on gathered citations')
+    SAVED = ce.Command('saved', lambda x, y: ve.view_mode(), 'view previously saved papers')
+    EXIT = ce.Command('exit', lambda x, y: sys.exit(), 'exit the program')
+    HELP = ce.Command('help', lambda x, y: UserOptions.display_help_options(), 'what each mode does')
 
     @classmethod
-    def execute_params(cls, params: List[str], search_query: sq.SaveQuery = None) -> UserOptions:
-        return super().execute_params(params, search_query)
-        if not params or len(params) > 1:
-            raise ValueError(f'only require command name to select a mode')
+    def execute_params(cls, args: List[str], search_query: sq.SaveQuery = None) -> UserOptions:
+
+        def valid_size(params: List[str]) -> None:
+            if not params or len(params) > 1:
+                raise ValueError(f'only require command name to select a mode')
+
+        return UserOptions(super().execute_params_with_checks(args, search_query, [valid_size]))
 
 
 def main(sys_mode: str) -> None:
     if sys_mode not in ('prod', 'dev'):
         raise ValueError(f'{sys_mode} is an unsupported system mode')
 
-    # load env variables, init_db
+    # load env variables, set up database
     load_env_file(ENV_FILE)
     db.init_db(SCHEMA_FILE)
 
@@ -60,7 +63,7 @@ def main(sys_mode: str) -> None:
 
 
 if __name__ == '__main__':
-    args = sys.argv[1:]
-    if len(args) != 1:
+    user_args = sys.argv[1:]
+    if len(user_args) != 1:
         raise ValueError('require only one argument to select mode shell runs in')
-    main(args[0])
+    main(user_args[0])

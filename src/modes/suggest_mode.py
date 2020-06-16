@@ -11,55 +11,49 @@ import src.db_init as dbi
 """Module for suggesting new papers to a user based on previously saved papers."""
 
 
+def add_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    ids = ce.is_list_of_n_ints(args)
+    for result_id in ids:
+        save_query.select_id(result_id)
+
+
+def cont_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    ce.is_list_of_n_ints(args, 0)
+
+
+def quit_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    ce.is_list_of_n_ints(args, 0)
+    save_query.submit()
+
+
+def view_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    ce.is_list_of_n_ints(args, 0)
+    print(save_query)
+
+
+def more_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    selected_id = ce.is_list_of_n_ints(args, 1)[0]
+    if not save_query.is_valid_id(selected_id):
+        raise ValueError(f'selected id {selected_id} is not a valid id')
+    print(save_query.get_result(selected_id))
+
+
+def help_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    ce.is_list_of_n_ints(args, 0)
+    UserSuggestOptions.display_help_options()
+
+
 class UserSuggestOptions(ce.CmdEnum):
-    ADD = 'add'  # to add papers to the query of papers to retrieve
-    CONT = 'cont'  # to view more results
-    QUIT = 'quit'  # to quit viewing this mode
-    MORE = 'more'  # to view more information about a previously displayed paper
-    VIEW = 'view'  # to view what papers have been added to the queue of papers to save
-    HELP = 'help'  # to view what each option does
+    ADD = ce.Command('add', add_cmd_func, 'to add papers to the query of papers to retrieve')
+    CONT = ce.Command('cont', cont_cmd_func, 'to view more results')
+    QUIT = ce.Command('quit', quit_cmd_func, 'to quit viewing this mode')
+    MORE = ce.Command('more', more_cmd_func, 'to view more information about a previously displayed paper')
+    VIEW = ce.Command('view', view_cmd_func, 'to view what papers have been added to the queue of papers to save')
+    HELP = ce.Command('help', help_cmd_func, 'to view what each option does')
 
     @classmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserSuggestOptions:
-        super().execute_params(params, save_query)
-        cmd, params = params[0], params[1:]
-
-        if cmd == UserSuggestOptions.MORE:
-            selected_id = ce.is_list_of_n_ints(params, 1)[0]
-            if not save_query.is_valid_id(selected_id):
-                raise ValueError(f'selected id {selected_id} is not a valid id')
-            print(save_query.get_result(selected_id))
-            return UserSuggestOptions.MORE
-
-        elif cmd == UserSuggestOptions.ADD:
-            ids = ce.is_list_of_n_ints(params)
-            for result_id in ids:
-                save_query.select_id(result_id)
-            return UserSuggestOptions.ADD
-
-        elif cmd == UserSuggestOptions.CONT:
-            ce.is_list_of_n_ints(params, 0)
-            return UserSuggestOptions.CONT
-
-        elif cmd == UserSuggestOptions.QUIT:
-            ce.is_list_of_n_ints(params, 0)
-            save_query.submit()
-            return UserSuggestOptions.QUIT
-
-        elif cmd == UserSuggestOptions.HELP:
-            ce.is_list_of_n_ints(params, 0)
-            print("\noptions:\n"
-                  "- 'more id' to view more info about a paper\n"
-                  "- 'cont' to view more results\n"
-                  "- 'add ids' to add results\n"
-                  "- 'view' to see what papers will be saved\n"
-                  "- 'quit' to terminate viewing suggestions, save any papers in the save queue")
-            return UserSuggestOptions.HELP
-
-        else:  # must be view
-            ce.is_list_of_n_ints(params, 0)
-            print(save_query)
-            return UserSuggestOptions.VIEW
+        return UserSuggestOptions(super().execute_params_with_checks(params, save_query))
 
 
 def suggest_mode():

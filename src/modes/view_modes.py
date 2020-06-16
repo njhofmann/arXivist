@@ -11,65 +11,59 @@ import src.utility.cmd_enum as ce
 """Mode for viewing, removing, or editing previously saved entries."""
 
 
+def quit_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    ce.is_list_of_n_ints(args, 0)
+
+
+def cont_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    ce.is_list_of_n_ints(args, 0)
+
+
+def more_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    selected_id = ce.is_list_of_n_ints(args, 1)[0]
+    if not save_query.is_valid_id(selected_id):
+        raise ValueError(f'selected id {selected_id} is not a valid id')
+    print(save_query.get_result(selected_id))
+
+
+def open_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    selected_id = ce.is_list_of_n_ints(args, 1)[0]
+    if not save_query.is_valid_id(selected_id):
+        raise ValueError(f'selected id {selected_id} is not a valid id')
+    pu.open_pdf(save_query.get_result(selected_id).pdf_path)
+
+
+def help_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    ce.is_list_of_n_ints(args, 0)
+    UserViewModes.display_help_options()
+
+
+def del_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    paper_idx = ce.is_list_of_n_ints(args, 1)[0]
+    if not save_query.is_valid_id(paper_idx):
+        raise ValueError(f'invalid id {paper_idx}')
+    paper_id = save_query.get_result(paper_idx).id
+    rm.remove_paper(paper_id)
+    print(f'removed paper {paper_id}')
+
+
+def key_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    # TODO finish me
+    print('not implemented yet')
+
+
 class UserViewModes(ce.CmdEnum):
-    QUIT = 'quit'  # quit the mode
-    CONT = 'cont'  # continue viewing more search results
-    MORE = 'more'  # view summary info about a selected pdf
-    OPEN = 'open'  # open a file for viewing
-    HELP = 'help'  # view what each option does
-    DEL = 'del'  # removes paper and associated data
-    KEY = 'key'  # for adding a keyword to a retrieved paper
+    QUIT = ce.Command('quit', quit_cmd_func, 'quit the mode')
+    CONT = ce.Command('cont', cont_cmd_func, 'continue viewing more search results')
+    MORE = ce.Command('more', more_cmd_func, 'view summary info about a selected pdf')
+    OPEN = ce.Command('open', open_cmd_func, 'open a file for viewing')
+    HELP = ce.Command('help', help_cmd_func, 'view what each option does')
+    DEL = ce.Command('del', del_cmd_func, 'removes paper and associated data')
+    KEY = ce.Command('key', key_cmd_func, 'for adding a keyword to a retrieved paper')
 
     @classmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserViewModes:
-        super().execute_params(params, save_query)
-        cmd, params = params[0], params[1:]
-
-        if cmd == UserViewModes.MORE:
-            selected_id = ce.is_list_of_n_ints(params, 1)[0]
-            if not save_query.is_valid_id(selected_id):
-                raise ValueError(f'selected id {selected_id} is not a valid id')
-            print(save_query.get_result(selected_id))
-            return UserViewModes.MORE
-
-        elif cmd == UserViewModes.CONT:
-            ce.is_list_of_n_ints(params, 0)
-            return UserViewModes.CONT
-
-        elif cmd == UserViewModes.QUIT:
-            ce.is_list_of_n_ints(params, 0)
-            return UserViewModes.QUIT
-
-        elif cmd == UserViewModes.DEL:
-            paper_idx = ce.is_list_of_n_ints(params, 1)[0]
-            if not save_query.is_valid_id(paper_idx):
-                raise ValueError(f'invalid id {paper_idx}')
-            paper_id = save_query.get_result(paper_idx).id
-            rm.remove_paper(paper_id)
-            print(f'removed paper {paper_id}')
-            return UserViewModes.DEL
-
-        elif cmd == UserViewModes.KEY:
-            # TODO finish me
-            return UserViewModes.KEY
-
-        elif cmd == UserViewModes.HELP:
-            ce.is_list_of_n_ints(params, 0)
-            print("\noptions:\n"
-                  "- 'more id' to view more info\n"
-                  "- 'cont' to view more results\n"
-                  "- 'open id' to open current selected paper\n"
-                  "- 'del id' to remove a retrieved paper"
-                  "- 'key id word' to add a keyword to a paper"
-                  "- 'quit' to terminate viewing\n")
-            return UserViewModes.HELP
-
-        else:
-            selected_id = ce.is_list_of_n_ints(params, 1)[0]
-            if not save_query.is_valid_id(selected_id):
-                raise ValueError(f'selected id {selected_id} is not a valid id')
-            pu.open_pdf(save_query.get_result(selected_id).pdf_path)
-            return UserViewModes.OPEN
+        return UserViewModes(super().execute_params_with_checks(params, save_query))
 
 
 def view_mode():

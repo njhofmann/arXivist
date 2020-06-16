@@ -1,11 +1,12 @@
 # arXivist
-arXivist is a terminal environment allowing for the management of pre-print papers from arXiv on a local machine. 
+arXivist is a terminal environment for the management of pre-print papers from sites such as arXiv on a local machine. 
 
 ## Motivation
 Most search engines for research papers I am aware of are GUI based, usually accessed only via a web browser. As far as
-I am aware, an equivalent utility for terminals does not exist. This project aims to fill that gap as a comprehensive, 
-easily set up utility for finding, storing, and tagging research papers from pre-print sites, from the 
-comfort of the command line.
+I am aware, an equivalent utility for terminals does not exist - this project aims to fill that gap. 
+
+The goal is to provide a comparatively powerful & easily set up search tool for finding, storing, and tagging research papers 
+from pre-print sites, all from the comfort of the command line.
 
 ## Installation
 arXivist is built on top of Bash, Docker, and Docker-Compose - any system that has these installed should be 
