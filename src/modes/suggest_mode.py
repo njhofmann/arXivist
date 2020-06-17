@@ -1,45 +1,45 @@
 from __future__ import annotations
-from typing import List
-import psycopg2 as psy
 
-import src.database.retrieve as dbr
+from typing import List
+
 import src.api.retrieve_paper as rp
-import src.utility.save_query as sq
+import src.database.retrieve as dbr
 import src.utility.cmd_enum as ce
-import src.db_init as dbi
+import src.utility.save_query as sq
+import util as u
 
 """Module for suggesting new papers to a user based on previously saved papers."""
 
 
 def add_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    ids = ce.is_list_of_n_ints(args)
+    ids = u.is_list_of_n_ints(args)
     for result_id in ids:
         save_query.select_id(result_id)
 
 
 def cont_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    ce.is_list_of_n_ints(args, 0)
+    u.is_list_of_n_ints(args, 0)
 
 
 def quit_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    ce.is_list_of_n_ints(args, 0)
+    u.is_list_of_n_ints(args, 0)
     save_query.submit()
 
 
 def view_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    ce.is_list_of_n_ints(args, 0)
+    u.is_list_of_n_ints(args, 0)
     print(save_query)
 
 
 def more_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    selected_id = ce.is_list_of_n_ints(args, 1)[0]
+    selected_id = u.is_list_of_n_ints(args, 1)[0]
     if not save_query.is_valid_id(selected_id):
         raise ValueError(f'selected id {selected_id} is not a valid id')
     print(save_query.get_result(selected_id))
 
 
 def help_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    ce.is_list_of_n_ints(args, 0)
+    u.is_list_of_n_ints(args, 0)
     UserSuggestOptions.display_help_options()
 
 
@@ -57,13 +57,10 @@ class UserSuggestOptions(ce.CmdEnum):
 
 
 def suggest_mode():
-    with psy.connect(dbname=dbi.get_db_info().db_name) as conn:
-        with conn.cursor() as cursor:
-            suggestion_ids = dbr.get_suggestions(cursor)
+    suggested_ids = dbr.get_suggested_papers()
+    results = rp.SearchQuery(id_params=suggested_ids).retrieve_search_results()
 
-    search_query = rp.SearchQuery(id_params=suggestion_ids)
-    results = search_query.retrieve_search_results()
-
+    print('entered suggest mode')
     save_query = sq.SaveQuery()
     for response in results:
         time_to_quit = False
@@ -71,12 +68,9 @@ def suggest_mode():
             save_query.add_valid_id(idx, result)
             print(idx, result.title)
 
-        print('entered suggest mode\n')
-
         wait_on_user = True
         while wait_on_user:
-            results_response = input('waiting...\n')
-            results_response = [result for result in results_response.split(' ') if result]
+            results_response = u.get_formatted_user_input('waiting')
             cmd = UserSuggestOptions.execute_params(results_response, save_query)
 
             if cmd == UserSuggestOptions.CONT:

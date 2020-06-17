@@ -1,8 +1,11 @@
+from typing import List, Tuple, Iterable, Dict
+
 import psycopg2 as psy
 from psycopg2 import sql
-from typing import List, Tuple, Iterable, Dict
-import src.utility.search_result as sr
+
+import src.db_util as db
 import src.utility.base_query as bq
+import src.utility.search_result as sr
 
 """Module containing classes and functions relating to retrieving data from the database"""
 
@@ -27,14 +30,13 @@ class DatabaseQuery(bq.BaseQuery):
         return [sql.Identifier(table, column) for _ in range(n)]
 
     def as_sql_query(self):
-        columns_to_params = {'arvix_id': self.id_params, 'abstract': self.abstract_params, 'title': self.title_params,
+        cols_to_params = {'arvix_id': self.id_params, 'abstract': self.abstract_params, 'title': self.title_params,
                              'author': self.author_params}
 
-        columns_to_formatted_params = {column: self.format_params(params)
-                                       for column, params in columns_to_params.items()}
+        col_to_formatted_params = {col: self.format_params(params) for col, params in cols_to_params.items()}
 
         columns_to_identifiers = {}
-        for column, params in columns_to_params.items():
+        for column, params in cols_to_params.items():
             table = 'pa' if column == 'author' else 'pi'
             n = len(params)
             columns_to_identifiers[column] = self.n_column_identifiers(table, column, n)
@@ -50,7 +52,7 @@ class DatabaseQuery(bq.BaseQuery):
         formatted_params = ''
         for column, identifiers in columns_to_identifiers.items():
             if identifiers:
-                formatted_params += (' AND ' if formatted_params else '') + columns_to_formatted_params[column]
+                formatted_params += (' AND ' if formatted_params else '') + col_to_formatted_params[column]
                 base_identifiers.extend(identifiers)
 
         if formatted_params:
@@ -71,11 +73,12 @@ class DatabaseQuery(bq.BaseQuery):
         return list(search_results.values())
 
     def get_results(self) -> List[Tuple[int, sr.SearchResult]]:
-        with psy.connect(dbname='arxiv') as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(self.as_sql_query())
-                results = cursor.fetchall()
 
+        def execute(cursor):
+            cursor.execute(self.as_sql_query())
+            return cursor.fetchall()
+
+        results = db.generic_db_query(execute)
         search_results = self.aggregate_results(results)
         count = self.start
         while count < len(search_results):
@@ -92,7 +95,11 @@ def get_suggestions(cursor) -> List[str]:
         sql.Identifier('added_ids'), sql.Identifier('a'), sql.Identifier('p', 'parent_id'), sql.Identifier('a', 'id'),
         sql.Identifier('p', 'parent_id'))
     cursor.execute(query)
-    return [result[0] for result in cursor.fetchall()]
+    return list(map(lambda x: x[0], cursor.fetchall))
+
+
+def get_suggested_papers() -> List[str]:
+    return db.generic_db_query(get_suggestions)
 
 
 if __name__ == '__main__':

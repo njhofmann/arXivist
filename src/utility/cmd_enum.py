@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 import abc
+import dataclasses as dc
 import enum as e
 from typing import Any, List, Callable
-import dataclasses as dc
+
 import src.utility.save_query as sq
 
 
@@ -44,7 +46,7 @@ class CmdEnum(e.Enum):
 
     @classmethod
     def execute_params_with_checks(cls, args: List[str], save_query: sq.SaveQuery = None,
-                       checks: List[Callable[[List[str]], None]] = None) -> CmdEnum:
+                                   checks: List[Callable[[List[str]], None]] = None) -> CmdEnum:
         """Maps the relationship between each defined type of CommandEnum and associated operations. Given a list of
         parameters, a command and any relevant arguments, attempts to execute operations associated with command listed
         in the params, should be the first item in the list - ie "cmd arg1 ... argn". Throws ValueError if unsupported
@@ -67,11 +69,3 @@ class CmdEnum(e.Enum):
                 mode.value.func(params, save_query)
                 return mode
         raise ValueError(f'invalid response {cmd}, must be one of {cls.values_as_str()}')
-
-
-def is_list_of_n_ints(to_parse: List[str], n: int = -1) -> List[int]:
-    if not to_parse:
-        return []
-    elif -1 < n != len(to_parse):  # -1 means variable length
-        raise ValueError(f'given list {to_parse} must have only {n} entries')
-    return [int(item) for item in to_parse]

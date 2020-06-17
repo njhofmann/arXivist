@@ -1,15 +1,18 @@
 from __future__ import annotations
-from typing import List
+
 import pathlib as pl
 import sys
+from typing import List
+
 import read_env as re
+
+import src.db_util as db
 import src.modes.search_mode as se
-import src.modes.view_modes as ve
 import src.modes.suggest_mode as sm
-import src.utility.save_query as sq
-import src.utility.cmd_enum as ce
-import src.db_init as db
+import src.modes.view_mode as ve
 import src.util as u
+import src.utility.cmd_enum as ce
+import src.utility.save_query as sq
 
 """Main entry point for the arXives shell. Displays set of supported "modes" (search, viewing, suggestion, etc.) user
 can select from."""
@@ -54,7 +57,7 @@ def main(sys_mode: str) -> None:
     while True:
         try:
             UserOptions.display_available_options()
-            user_mode = u.get_user_input('').split(' ')
+            user_mode = u.get_formatted_user_input()
             UserOptions.execute_params(user_mode)
         except Exception as e:
             if sys_mode != 'prod':

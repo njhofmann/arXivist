@@ -1,16 +1,18 @@
 from __future__ import annotations
+
 from typing import List
-import src.utility.search_result as sr
+
 import src.api.retrieve_paper as rp
-import src.utility.save_query as sq
-import src.utility.cmd_enum as ce
 import src.util as u
+import src.utility.cmd_enum as ce
+import src.utility.save_query as sq
+import util
 
 """Mode for searching for and saving papers from arXiv."""
 
 
 def more_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    selected_id = ce.is_list_of_n_ints(args, 1)[0]
+    selected_id = util.is_list_of_n_ints(args, 1)[0]
     if not save_query.is_valid_id(selected_id):
         raise ValueError(f'selected id {selected_id} is not a valid id')
     print(save_query.get_result(selected_id))
@@ -19,25 +21,25 @@ def more_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
 def add_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
     for param in args:
         save_query.select_id(int(param))
-    ce.is_list_of_n_ints(args)
+    util.is_list_of_n_ints(args)
 
 
 def cont_cmd_func(params: List[str], save_query: sq.SaveQuery) -> None:
-    ce.is_list_of_n_ints(params, 0)
+    util.is_list_of_n_ints(params, 0)
 
 
 def quit_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
     save_query.submit()
-    ce.is_list_of_n_ints(args, 0)
+    util.is_list_of_n_ints(args, 0)
 
 
 def view_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    ce.is_list_of_n_ints(args, 0)
+    util.is_list_of_n_ints(args, 0)
     print(save_query)
 
 
 def help_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    ce.is_list_of_n_ints(args, 0)
+    util.is_list_of_n_ints(args, 0)
     UserSearchResponses.display_help_options()
 
 
@@ -54,17 +56,9 @@ class UserSearchResponses(ce.CmdEnum):
         return UserSearchResponses(super().execute_params_with_checks(args, save_query))
 
 
-def format_params(params: List[str]) -> List[str]:
-    for idx, param in enumerate(params):
-        for char in ' ':
-            param = param.replace(char, '')
-        params[idx] = param
-    return list(filter(lambda x: bool(x), params))
-
-
 def search_mode():
     print('search mode entered')
-    params = format_params(u.get_user_input('enter search params').split(' '))
+    params = u.get_formatted_user_input('enter search params')
 
     print('fetching results...')
     search_query = rp.SearchQuery.from_params(params)
@@ -80,8 +74,7 @@ def search_mode():
 
         while True:
             UserSearchResponses.display_available_options()
-            user_response = u.get_user_input('')
-            results_response = sr.split_and_format_string(user_response)
+            results_response = u.get_formatted_user_input()
             cmd = UserSearchResponses.execute_params(results_response, save_query)
 
             if cmd == UserSearchResponses.CONT:

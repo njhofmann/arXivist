@@ -1,8 +1,17 @@
-import psycopg2 as psy
-import pathlib as pl
-from typing import Union
 import dataclasses as dc
 import os
+import pathlib as pl
+from typing import Union, Callable, Any, Optional
+
+import psycopg2 as psy
+
+
+def generic_db_query(func: Callable, *args: Any) -> Optional[Any]:
+    conn_info = get_db_info()
+    with psy.connect(user=conn_info.user, password=conn_info.user, database=conn_info.db_name) as conn:
+        conn.autocommit = True
+        with conn.cursor() as cursor:
+            return func(cursor, *args)
 
 
 @dc.dataclass(frozen=True)

@@ -1,16 +1,8 @@
 from __future__ import annotations
-from typing import Any, List, Final
+
 import dataclasses as dc
 import pathlib as pl
-
-
-def split_and_format_string(to_format: str) -> List[str]:
-    """Splits a string on any spaces in the string, removes any resulting empty strings, and returns a list of the split
-    string.
-    :param to_format: string to format
-    :return: split string
-    """
-    return [char for char in to_format.split(' ') if char]
+from typing import Any, List
 
 
 @dc.dataclass

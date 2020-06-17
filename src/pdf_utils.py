@@ -1,10 +1,12 @@
-import requests as r
 import pathlib as pl
-import uuid
 import subprocess as sbp
-import src.utility.search_result as u
-from typing import Union
 import sys
+import uuid
+from typing import Union
+
+import requests as r
+
+import src.utility.search_result as u
 
 FOLDER_PATH = pl.Path(__file__).parent.parent.joinpath('pdfs')
 BASE_ARXIV_PDF_URL = 'http://arxiv.org/pdf/'

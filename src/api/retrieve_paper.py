@@ -1,10 +1,12 @@
-import requests as r
-from typing import Iterable, List, Tuple
 import itertools as i
 import xml.etree as xe
-import src.utility.search_result as sr
 import xml.etree.ElementTree as xee
+from typing import Iterable, List, Tuple
+
+import requests as r
+
 import src.utility.base_query as bq
+import src.utility.search_result as sr
 
 
 class SearchQuery(bq.BaseQuery):

@@ -1,45 +1,46 @@
 from __future__ import annotations
+
 from typing import List
 
-import src.utility.search_result as sr
-import src.database.retrieve as dbr
-import src.utility.save_query as sq
 import src.database.remove as rm
+import src.database.retrieve as dbr
 import src.pdf_utils as pu
 import src.utility.cmd_enum as ce
+import src.utility.save_query as sq
+import util as u
 
 """Mode for viewing, removing, or editing previously saved entries."""
 
 
 def quit_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    ce.is_list_of_n_ints(args, 0)
+    u.is_list_of_n_ints(args, 0)
 
 
 def cont_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    ce.is_list_of_n_ints(args, 0)
+    u.is_list_of_n_ints(args, 0)
 
 
 def more_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    selected_id = ce.is_list_of_n_ints(args, 1)[0]
+    selected_id = u.is_list_of_n_ints(args, 1)[0]
     if not save_query.is_valid_id(selected_id):
         raise ValueError(f'selected id {selected_id} is not a valid id')
     print(save_query.get_result(selected_id))
 
 
 def open_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    selected_id = ce.is_list_of_n_ints(args, 1)[0]
+    selected_id = u.is_list_of_n_ints(args, 1)[0]
     if not save_query.is_valid_id(selected_id):
         raise ValueError(f'selected id {selected_id} is not a valid id')
     pu.open_pdf(save_query.get_result(selected_id).pdf_path)
 
 
 def help_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    ce.is_list_of_n_ints(args, 0)
+    u.is_list_of_n_ints(args, 0)
     UserViewModes.display_help_options()
 
 
 def del_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    paper_idx = ce.is_list_of_n_ints(args, 1)[0]
+    paper_idx = u.is_list_of_n_ints(args, 1)[0]
     if not save_query.is_valid_id(paper_idx):
         raise ValueError(f'invalid id {paper_idx}')
     paper_id = save_query.get_result(paper_idx).id
@@ -67,7 +68,7 @@ class UserViewModes(ce.CmdEnum):
 
 
 def view_mode():
-    search_params = sr.split_and_format_string(input('enter search params\n'))
+    search_params = u.split_and_format_string(input('enter search params\n'))
     db_query = dbr.DatabaseQuery.from_params(search_params)
     results = db_query.get_results()
     save_query = sq.SaveQuery()
@@ -81,7 +82,7 @@ def view_mode():
         print('view mode entered\n')
 
         while True:
-            results_response = sr.split_and_format_string(input('waiting...\n'))
+            results_response = u.get_formatted_user_input('waiting...')
             cmd = UserViewModes.execute_params(results_response, save_query)
 
             if cmd == UserViewModes.CONT:

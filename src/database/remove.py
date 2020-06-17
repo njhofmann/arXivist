@@ -1,7 +1,9 @@
-from psycopg2 import sql
-import psycopg2 as psy
-import src.db_init as dbi
 from typing import Tuple, Union
+
+import psycopg2 as psy
+from psycopg2 import sql
+
+import src.db_util as dbi
 
 """Module containing functionalities relating to remove data from the database"""
 
