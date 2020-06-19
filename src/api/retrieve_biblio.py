@@ -1,9 +1,7 @@
 import json as j
 import re
 from typing import List
-
 import requests as r
-
 import src.utility.search_result as u
 
 ARXIV_VERSION = re.compile('v[0-9]')

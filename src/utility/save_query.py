@@ -1,9 +1,6 @@
 from __future__ import annotations
-
 from typing import Set, Dict
-
 import src.api.retrieve_biblio as rb
-import src.api.retrieve_paper as rp
 import src.database.insert as dbi
 import src.db_util as dbu
 import src.pdf_utils as pu
@@ -16,7 +13,7 @@ class SaveQuery:
         self.selected_ids: Set[int] = set()
         self.valid_ids_to_info: Dict[int, sr.SearchResult] = {}
 
-    def add_valid_id(self, result_id: int, result: rp.SearchQuery) -> None:
+    def add_valid_id(self, result_id: int, result: sr.SearchResult) -> None:
         if result_id in self.valid_ids_to_info:
             raise ValueError(f'id {result_id} already added to list of valid ids')
         # TODO fix type error

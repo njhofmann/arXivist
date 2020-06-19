@@ -3,16 +3,15 @@ from __future__ import annotations
 from typing import List
 
 import src.api.retrieve_paper as rp
-import src.util as u
 import src.utility.cmd_enum as ce
 import src.utility.save_query as sq
-import util
+import src.util as u
 
 """Mode for searching for and saving papers from arXiv."""
 
 
 def more_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    selected_id = util.is_list_of_n_ints(args, 1)[0]
+    selected_id = u.is_list_of_n_ints(args, 1)[0]
     if not save_query.is_valid_id(selected_id):
         raise ValueError(f'selected id {selected_id} is not a valid id')
     print(save_query.get_result(selected_id))
@@ -21,25 +20,25 @@ def more_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
 def add_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
     for param in args:
         save_query.select_id(int(param))
-    util.is_list_of_n_ints(args)
+    u.is_list_of_n_ints(args)
 
 
 def cont_cmd_func(params: List[str], save_query: sq.SaveQuery) -> None:
-    util.is_list_of_n_ints(params, 0)
+    u.is_list_of_n_ints(params, 0)
 
 
 def quit_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
     save_query.submit()
-    util.is_list_of_n_ints(args, 0)
+    u.is_list_of_n_ints(args, 0)
 
 
 def view_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    util.is_list_of_n_ints(args, 0)
+    u.is_list_of_n_ints(args, 0)
     print(save_query)
 
 
 def help_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
-    util.is_list_of_n_ints(args, 0)
+    u.is_list_of_n_ints(args, 0)
     UserSearchResponses.display_help_options()
 
 

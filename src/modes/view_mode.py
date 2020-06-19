@@ -7,7 +7,7 @@ import src.database.retrieve as dbr
 import src.pdf_utils as pu
 import src.utility.cmd_enum as ce
 import src.utility.save_query as sq
-import util as u
+import src.util as u
 
 """Mode for viewing, removing, or editing previously saved entries."""
 

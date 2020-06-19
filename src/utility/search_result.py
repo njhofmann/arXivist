@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import dataclasses as dc
 import pathlib as pl
 from typing import Any, List

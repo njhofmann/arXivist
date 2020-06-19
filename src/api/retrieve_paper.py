@@ -1,10 +1,8 @@
 import itertools as i
+import requests as r
+from typing import Iterable, List, Tuple
 import xml.etree as xe
 import xml.etree.ElementTree as xee
-from typing import Iterable, List, Tuple
-
-import requests as r
-
 import src.utility.base_query as bq
 import src.utility.search_result as sr
 
@@ -28,10 +26,14 @@ class SearchQuery(bq.BaseQuery):
                                                        for code, params in search_codes_to_params.items()]))
         formatted_params = ('search_query=' + '+AND+'.join(formatted_params)) if formatted_params else ''
 
+        params = ''
         if formatted_params and id_params:
-            self.query = self.BASE_QUERY_URL + formatted_params + id_params
-        elif id_params or formatted_params:
-            self.query = self.BASE_QUERY_URL + (id_params if id_params else formatted_params)
+            params = formatted_params + id_params
+        elif id_params:
+            params = id_params
+        elif formatted_params:
+            params = formatted_params
+        self.query = self.BASE_QUERY_URL + params
 
     def get_response_with_limited_query(self, start: int, space: int) -> r.Response:
         return r.get(self.query + f'&start={start}&max_result={space}')
@@ -54,11 +56,8 @@ class SearchQuery(bq.BaseQuery):
         count = 0
         while True:
             search_results = self.parse_valid_response(self.get_response_with_limited_query(start, space).text)
-
-            for idx, result in enumerate(search_results):
-                search_results[idx] = (count, result)
-                count += 1
-            yield search_results
+            count += search_results
+            yield list(enumerate(search_results))
 
             start += space
             if start > end:
@@ -70,7 +69,7 @@ class SearchQuery(bq.BaseQuery):
     def get_atom_child_text(self, parent: xee.Element, tag: str) -> str:
         return self.get_atom_child(parent, tag).text
 
-    def get_atom_children(self, parent: xee.Element, tag: str) -> xee.Element:
+    def get_atom_children(self, parent: xee.Element, tag: str) -> List[xee.Element]:
         return parent.findall(self.XML_ATOM_ROOT + tag)
 
     def get_open_search_child(self, parent: xee.Element, tag: str) -> xee.Element:
@@ -103,7 +102,7 @@ class SearchQuery(bq.BaseQuery):
             authors = [self.get_atom_child(author, 'name').text for author in self.get_atom_children(entry, 'author')]
 
             parsed_entries.append(sr.SearchResult(title=title, id=arxiv_id, abstract=abstract, authors=authors,
-                                                 pdf_url=pdf_link, publish=date, keywords=[]))
+                                                  pdf_url=pdf_link, publish=date, keywords=[]))
         return parsed_entries
 
     def parse_error(self, error_msg: str):

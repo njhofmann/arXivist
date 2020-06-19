@@ -7,6 +7,7 @@
     * set up volumes
     * postgres port
     * port to web
+* set up docker with pycharm
 * abstract out database connection
 * fix search query, all option
 * separate out IO from logic

@@ -8,7 +8,7 @@ class ArgumentParserException(Exception):
 
 
 class RaisingArgParser(ap.ArgumentParser):
-    """Custom ArggumentParser class that raises exceptions instead of exiting the system."""
+    """Custom ArgumentParser class that raises exceptions instead of exiting the system."""
 
     def error(self, msg: str):
         raise ArgumentParserException(msg)
@@ -31,12 +31,13 @@ class BaseQuery(abc.ABC):
 
     @staticmethod
     def get_parser() -> RaisingArgParser:
-        parser = RaisingArgParser(prefix_chars='-')
-        parser.add_argument('-a', '--all', nargs='*', type=str, default=[])
-        parser.add_argument('-id', '--arvix_id', nargs='*', type=str, default=[])
-        parser.add_argument('-t', '--title', nargs='*', type=str, default=[])
-        parser.add_argument('-au', '--author', nargs='*', type=str, default=[])
-        parser.add_argument('-ab', '--abstract', nargs='*', type=str, default=[])
+        # TODO search by keyword..?
+        parser = RaisingArgParser(prefix_chars='-', description='parse paper search arguments')
+        parser.add_argument('-a', '--all', nargs='*', type=str, default=[], help='apply argument to each other param')
+        parser.add_argument('-id', '--arvix_id', nargs='*', type=str, default=[], help='search by arxiv id')
+        parser.add_argument('-t', '--title', nargs='*', type=str, default=[], help='search by words in title')
+        parser.add_argument('-au', '--author', nargs='*', type=str, default=[], help='search by parts of author name')
+        parser.add_argument('-ab', '--abstract', nargs='*', type=str, default=[], help='search by words in abstract')
         return parser
 
     @classmethod

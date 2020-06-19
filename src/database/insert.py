@@ -9,12 +9,11 @@ import src.utility.search_result as u
 
 
 def execute_insertion(cursor, table: str, column_to_value: Dict[str, str]) -> None:
-    blank_columns = ', '.join(['{}' for _ in column_to_value])
-    blank_values = ', '.join(['%s' for _ in column_to_value])
-    columns = [sql.Identifier(column) for column in column_to_value.keys()]
+    blank_cols = ', '.join(['{}' for _ in column_to_value])
+    blank_vals = ', '.join(['%s' for _ in column_to_value])
+    cols = [sql.Identifier(column) for column in column_to_value.keys()]
 
-    query = sql.SQL(f'INSERT INTO {{}} ({blank_columns}) VALUES ({blank_values})').format(
-        sql.Identifier(table), *columns)
+    query = sql.SQL(f'INSERT INTO {{}} ({blank_cols}) VALUES ({blank_vals})').format(sql.Identifier(table), *cols)
     cursor.execute(query, tuple(column_to_value.values()))
 
 

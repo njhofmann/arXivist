@@ -6,7 +6,7 @@ import src.api.retrieve_paper as rp
 import src.database.retrieve as dbr
 import src.utility.cmd_enum as ce
 import src.utility.save_query as sq
-import util as u
+import src.util as u
 
 """Module for suggesting new papers to a user based on previously saved papers."""
 

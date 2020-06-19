@@ -24,7 +24,7 @@ def load_env_file(env_path: pl.Path) -> None:
     re.read_env(env_path, recurse=False)
 
 
-ENV_FILE = pl.Path(__file__).parent.parent.joinpath('.env')
+ENV_FILE = pl.Path('.env')
 SCHEMA_FILE = pl.Path(__file__).parent.parent.joinpath('init.sql')
 
 
