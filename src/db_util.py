@@ -7,7 +7,7 @@ import psycopg2 as psy
 
 def generic_db_query(func: Callable, *args: Any) -> Optional[Any]:
     db_info = get_db_info()
-    with psy.connect(user=db_info.user, password=db_info.user, database=db_info.db_name, port=db_info.port) as conn:
+    with psy.connect(host=db_info.host, user=db_info.user, password=db_info.user, database=db_info.db_name, port=db_info.port) as conn:
         conn.autocommit = True
         with conn.cursor() as cursor:
             return func(cursor, *args)
@@ -19,7 +19,8 @@ class DatabaseConfig:
     db_name: str  # database name
     user: str  # name to login to database system with
     password: str  # password to login into the database system with
-    port: int  # port of database to connect to
+    host: str
+    port: str  # port of database to connect to
 
 
 def get_db_info() -> DatabaseConfig:
@@ -28,7 +29,7 @@ def get_db_info() -> DatabaseConfig:
     :return: DatabaseConfig with read in file
     """
     return DatabaseConfig(os.environ['POSTGRES_DB'], os.environ['POSTGRES_USER'], os.environ['POSTGRES_PASSWORD'],
-                          int(os.environ['POSTGRES_PORT']))
+                          os.environ['POSTGRES_HOST'], os.environ['POSTGRES_PORT'])
 
 
 def init_db(schema_file: Union[str, pl.Path]) -> None:
@@ -39,7 +40,7 @@ def init_db(schema_file: Union[str, pl.Path]) -> None:
     :return: None
     """
     db_info = get_db_info()
-    with psy.connect(host='postgres', port=db_info.port, user=db_info.user, password='postgres') as conn:
+    with psy.connect(host=db_info.host, port=db_info.port, user=db_info.user, password=db_info.password) as conn:
         conn.autocommit = True
         with conn.cursor() as cursor:
             # check that database with same name doesn't exist
@@ -48,7 +49,7 @@ def init_db(schema_file: Union[str, pl.Path]) -> None:
             if db_info.db_name not in databases:
                 cursor.execute(f'CREATE DATABASE {db_info.db_name}')
 
-    with psy.connect(user=db_info.user, password=db_info.user, database=db_info.db_name, port=db_info.port) as conn:
+    with psy.connect(host=db_info.host, user=db_info.user, password=db_info.user, database=db_info.db_name, port=db_info.port) as conn:
         conn.autocommit = True
         with conn.cursor() as cursor:
             with open(schema_file, 'r') as schema:
