@@ -103,6 +103,7 @@ venv.bak/
 .mypy_cache/
 
 .idea/
+LOG_FILE
 pdfs/
 .run
 docker

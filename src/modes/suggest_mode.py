@@ -58,7 +58,7 @@ class UserSuggestOptions(ce.CmdEnum):
 
 def suggest_mode():
     suggested_ids = dbr.get_suggested_papers()
-    results = rp.SearchQuery(id_params=suggested_ids).retrieve_search_results()
+    results = rp.SearchQuery(id_args=suggested_ids).retrieve_search_results()
 
     print('entered suggest mode')
     save_query = sq.SaveQuery()

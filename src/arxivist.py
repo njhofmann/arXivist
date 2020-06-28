@@ -14,11 +14,15 @@ import src.util as u
 import src.utility.cmd_enum as ce
 import src.utility.save_query as sq
 
-"""Main entry point for the arXives shell. Displays set of supported "modes" (search, viewing, suggestion, etc.) user
+"""Main entry point for the arXivist shell. Displays set of supported "modes" (search, viewing, suggestion, etc.) user
 can select from."""
 
 
 def load_env_file(env_path: pl.Path) -> None:
+    """Loads the environmental variables of the environmental variables path into the system
+    :param env_path: path to the environmental variables file
+    :return: None
+    """
     if not pl.Path(env_path).exists():
         raise RuntimeError(f'path to config file {env_path} doesn\'t exist')
     re.read_env(env_path, recurse=False)

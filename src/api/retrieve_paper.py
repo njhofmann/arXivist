@@ -8,29 +8,40 @@ import src.utility.search_result as sr
 
 
 class SearchQuery(bq.BaseQuery):
+    """Represents a search query for papers on Arxiv"""
+
     BASE_QUERY_URL = 'http://export.arxiv.org/api/query/?'
     BASE_ARXIV_URL = 'http://arxiv.org/abs/'
     XML_ATOM_ROOT = '{http://www.w3.org/2005/Atom}'
     XML_OPEN_SEARCH_ROOT = '{http://a9.com/-/spec/opensearch/1.1/}'
 
-    def __init__(self, title_params: Iterable[str] = (), author_params: Iterable[str] = (),
-                 abstract_params: Iterable[str] = (), id_params: Iterable[str] = (),
+    def __init__(self, title_args: Iterable[str] = (), author_args: Iterable[str] = (),
+                 abstract_args: Iterable[str] = (), id_args: Iterable[str] = (),
                  max_result: int = 10, start: int = 0) -> None:
-        super().__init__(title_params=title_params, author_params=author_params, abstract_params=abstract_params,
-                         id_params=id_params, max_result=max_result, start=start)
-        search_codes_to_params = {'ti': title_params, 'au': author_params, 'abs': abstract_params}
+        """Creates a SearchQuery from the given search arguments
+        :param title_args: arguments to search for in papers's titles
+        :param author_args: arguments to search for in papers's authors
+        :param abstract_args: arguments to search for in paper's abstracts
+        :param id_args: arguments to search for in paper's arxiv IDs
+        :param max_result: maximum number of pages to return per results
+        :param start: page to start searching on
+        :return: None
+        """
+        super().__init__(title_params=title_args, author_params=author_args, abstract_params=abstract_args,
+                         id_params=id_args, max_result=max_result, start=start)
+        search_codes_to_params = {'ti': title_args, 'au': author_args, 'abs': abstract_args}
 
-        id_params = ('id_list=' + ','.join(id_params)) if id_params else ''
+        id_args = ('id_list=' + ','.join(id_args)) if id_args else ''
 
         formatted_params = list(i.chain.from_iterable([[f'{code}:{param}' for param in params]
                                                        for code, params in search_codes_to_params.items()]))
         formatted_params = ('search_query=' + '+AND+'.join(formatted_params)) if formatted_params else ''
 
         params = ''
-        if formatted_params and id_params:
-            params = formatted_params + id_params
-        elif id_params:
-            params = id_params
+        if formatted_params and id_args:
+            params = formatted_params + id_args
+        elif id_args:
+            params = id_args
         elif formatted_params:
             params = formatted_params
         self.query = self.BASE_QUERY_URL + params
@@ -115,7 +126,7 @@ class SearchQuery(bq.BaseQuery):
 
 
 if __name__ == '__main__':
-    url = SearchQuery(title_params=['learning', 'reinforcement', 'deep', 'replay'])
+    url = SearchQuery(title_args=['learning', 'reinforcement', 'deep', 'replay'])
     print(url)
     results = url.retrieve_search_results()
     print(list(results))

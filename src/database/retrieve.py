@@ -1,8 +1,5 @@
 from typing import List, Tuple, Iterable, Dict
-
-import psycopg2 as psy
 from psycopg2 import sql
-
 import src.db_util as db
 import src.utility.base_query as bq
 import src.utility.search_result as sr
@@ -11,18 +8,28 @@ import src.utility.search_result as sr
 
 
 class DatabaseQuery(bq.BaseQuery):
+    """Represents a query to the application's database for previously entered info"""
 
-    def __init__(self, title_params: Iterable[str] = (), author_params: Iterable[str] = (),
-                 abstract_params: Iterable[str] = (), id_params: Iterable[str] = (),
-                 max_result: int = 10, start: int = 0) -> None:
-        super().__init__(title_params=title_params, author_params=author_params, abstract_params=abstract_params,
-                         id_params=id_params, max_result=max_result, start=start)
-        
+    def __init__(self, title_args: Iterable[str] = (), author_args: Iterable[str] = (),
+                 abstract_args: Iterable[str] = (), id_args: Iterable[str] = (), max_result: int = 10,
+                 start: int = 0) -> None:
+        """Creates a DatabaseQuery from the given search arguments
+        :param title_args: arguments to search for in papers's titles
+        :param author_args: arguments to search for in papers's authors
+        :param abstract_args: arguments to search for in paper's abstracts
+        :param id_args: arguments to search for in paper's arxiv IDs
+        :param max_result: maximum number of pages to return per results
+        :param start: page to start searching on
+        :return: None
+        """
+        super().__init__(title_params=title_args, author_params=author_args, abstract_params=abstract_args,
+                         id_params=id_args, max_result=max_result, start=start)
+
     @staticmethod
     def format_params(params: Iterable[str]) -> str:
         formatted_params = [f'LOWER({{}}) LIKE \'%{param.lower()}%\'' for param in params]
         return ' AND '.join(formatted_params)
-    
+
     @staticmethod
     def n_column_identifiers(table: str, column: str, n: int) -> List[sql.Identifier]:
         if n < 1:
@@ -31,10 +38,9 @@ class DatabaseQuery(bq.BaseQuery):
 
     def as_sql_query(self):
         cols_to_params = {'arvix_id': self.id_params, 'abstract': self.abstract_params, 'title': self.title_params,
-                             'author': self.author_params}
+                          'author': self.author_params}
 
         col_to_formatted_params = {col: self.format_params(params) for col, params in cols_to_params.items()}
-
         columns_to_identifiers = {}
         for column, params in cols_to_params.items():
             table = 'pa' if column == 'author' else 'pi'
@@ -87,7 +93,7 @@ class DatabaseQuery(bq.BaseQuery):
             count += self.max_result
 
 
-def get_suggestions(cursor) -> List[str]:
+def get_suggested_papers_from_db(cursor) -> List[str]:
     query = sql.SQL('WITH {} AS (SELECT DISTINCT({}) {} FROM {}) '
                     'SELECT {} FROM {} {}, {} {} WHERE {} != {} GROUP BY {} ORDER BY COUNT(*) ').format(
         sql.Identifier('added_ids'), sql.Identifier('child_id'), sql.Identifier('id'), sql.Identifier('citation_graph'),
@@ -99,8 +105,8 @@ def get_suggestions(cursor) -> List[str]:
 
 
 def get_suggested_papers() -> List[str]:
-    return db.generic_db_query(get_suggestions)
+    return db.generic_db_query(get_suggested_papers_from_db)
 
 
 if __name__ == '__main__':
-    get_suggestions()
+    get_suggested_papers_from_db()
