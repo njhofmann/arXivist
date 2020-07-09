@@ -1,27 +1,31 @@
-* refactor existing codebase
+1. refactor existing codebase
     * rework mode loops
-* set up docker integration
-    * set up volumes
+1. set up docker integration
+    * pdf volume
     * postgres volumes
-    * port to web
-* set up docker with pycharm
-* abstract out database connection
-* fix search query, all option
-* separate out IO from logic
-* keyword args for search
-* removal options
+    * port to http requests
+1. set up docker with pycharm
+1. add help option for querying on entering mode
+1. prod and dev mode to env 
+1. view fetched results again
+1. semantic scholar api fix
+1. abstract out database connection
+1. separate out IO from logic
+1. keyword args for search
+1. removal options
     * remove keyword
     * remove added paper
-* clear previously displayed text
-* dump / reload database
-* keyword args
+1. clear previously displayed text?
+1. dump / reload database
+    1. redownload all options
+1. keyword args
     * add keyword args to existing
     * add keyword args before saving
-* add support for other pre-print repos
+1. add support for other pre-print repos
     * bioRxiv
     * chemRxiv
     * psyArxiv
     * socArxiv
-* steps to publish as library or fully fledged app
+1. steps to publish as library or fully fledged app
     * versioning
-* separate out io for testing and prod
+1.  separate out io for testing and prod

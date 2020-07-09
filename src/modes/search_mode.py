@@ -60,7 +60,7 @@ def search_mode():
     params = u.get_formatted_user_input('enter search params')
 
     print('fetching results...')
-    search_query = rp.SearchQuery.from_params(params)
+    search_query = rp.SearchQuery.from_args(params)
     print('results fetched')
 
     save_query = sq.SaveQuery()

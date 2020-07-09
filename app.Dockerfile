@@ -3,4 +3,5 @@ COPY src /src/
 COPY init.sql .
 COPY .env .
 COPY requirements.txt .
+RUN mkdir --mode=777 /pdfs
 RUN pip install --no-cache-dir -r requirements.txt

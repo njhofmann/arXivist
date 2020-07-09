@@ -27,8 +27,8 @@ class SearchQuery(bq.BaseQuery):
         :param start: page to start searching on
         :return: None
         """
-        super().__init__(title_params=title_args, author_params=author_args, abstract_params=abstract_args,
-                         id_params=id_args, max_result=max_result, start=start)
+        super().__init__(title_args=title_args, author_args=author_args, abstract_args=abstract_args,
+                         id_args=id_args, max_result=max_result, start=start)
         search_codes_to_params = {'ti': title_args, 'au': author_args, 'abs': abstract_args}
 
         id_args = ('id_list=' + ','.join(id_args)) if id_args else ''
@@ -67,7 +67,7 @@ class SearchQuery(bq.BaseQuery):
         count = 0
         while True:
             search_results = self.parse_valid_response(self.get_response_with_limited_query(start, space).text)
-            count += search_results
+            count += len(search_results)
             yield list(enumerate(search_results))
 
             start += space

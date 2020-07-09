@@ -4,6 +4,7 @@ from typing import Iterable, List
 
 
 class ArgumentParserException(Exception):
+    """An Exception for an when error occurs in an ArgumentParser"""
     pass
 
 
@@ -36,7 +37,7 @@ class BaseQuery(abc.ABC):
         """
         # TODO search by keyword..?
         parser = RaisingArgParser(prefix_chars='-', description='parse paper search arguments')
-        parser.add_argument('-a', '--all', nargs='*', type=str, default=[], help='apply argument to each other arg')
+        parser.add_argument('-a', '--all', nargs='*', type=str, default=[], help='apply argument to every other arg')
         parser.add_argument('-id', '--arvix_id', nargs='*', type=str, default=[], help='search by arxiv id')
         parser.add_argument('-t', '--title', nargs='*', type=str, default=[], help='search by words in title')
         parser.add_argument('-au', '--author', nargs='*', type=str, default=[], help='search by parts of author name')

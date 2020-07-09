@@ -23,8 +23,8 @@ fi
 
 reset
 echo "entering arXivist"
-docker exec -it $(docker-compose ps -q app) python -m src.arxivist prod
+docker exec -it $(docker-compose ps -q app) python -m src.arxivist dev
 
 echo "exiting arXivist"
 docker-compose stop >> $LOG_FILE &
-reset
+#reset
