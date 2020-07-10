@@ -16,11 +16,14 @@ services:
 
   app:
     stdin_open: true
+    user: root
     tty: true
     build:
       context: .
       dockerfile: app.Dockerfile
     volumes:
-      - ${HOST_SAVE_DIRC}:${CONTAINER_SAVE_DIRC}
+      # not sure why Z is needed, https://stackoverflow.com/questions/24288616/permission-denied-on-accessing-host-directory-in-docker
+      - ${HOST_SAVE_DIRC}:${CONTAINER_SAVE_DIRC}:Z
     depends_on:
       - postgres
+

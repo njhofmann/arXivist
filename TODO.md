@@ -1,12 +1,9 @@
 1. refactor existing codebase
     * rework mode loops
 1. set up docker integration
-    * pdf volume
     * postgres volumes
-    * port to http requests
 1. set up docker with pycharm
 1. add help option for querying on entering mode
-1. prod and dev mode to env 
 1. view fetched results again
 1. semantic scholar api fix
 1. abstract out database connection

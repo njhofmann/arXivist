@@ -2,6 +2,11 @@
 
 LOG_FILE="output.log"
 
+# load env file
+set -o allexport
+source ./.env
+set +o allexport
+
 if [ $# -gt 1 ]; then
     echo "require zero or one arguments"
     exit 1
@@ -23,8 +28,12 @@ fi
 
 reset
 echo "entering arXivist"
-docker exec -it $(docker-compose ps -q app) python -m src.arxivist dev
+docker exec -it $(docker-compose ps -q app) python -m src.arxivist $PROGRAM_MODE
 
 echo "exiting arXivist"
 docker-compose stop >> $LOG_FILE &
-#reset
+
+# clear if production mode
+if [ $PROGRAM_MODE = prod ]; then
+  reset
+fi
