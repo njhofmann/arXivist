@@ -1,7 +1,7 @@
 from __future__ import annotations
 import dataclasses as dc
 import pathlib as pl
-from typing import Any, List
+from typing import Any, List, Set
 
 
 @dc.dataclass
@@ -9,7 +9,7 @@ class SearchResult:
     """Represents a paper retrieved as a result of a query to the database or directly from arXiv itself"""
     id: str  # paper's arxiv id
     authors: List[str]  # authors of paper in terms of listed authorship
-    keywords: List[str]  # keywords assigned to this paper for retrieval in the database
+    keywords: Set[str]  # keywords assigned to this paper for retrieval in the database
     title: str = ''  # title of paper
     abstract: str = ''  # summary of the paper
     publish: str = ''  # date this paper was published
@@ -33,6 +33,6 @@ class SearchResult:
 
     def add_keyword(self, keyword: str) -> None:
         if self.keywords:
-            self.keywords.append(keyword)
+            self.keywords.add(keyword)
         else:
-            self.keywords = [keyword]
+            self.keywords = {keyword}
