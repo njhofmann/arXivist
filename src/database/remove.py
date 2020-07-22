@@ -24,6 +24,6 @@ def remove_keyword(arxiv_id: str, keyword: str) -> None:
     :param cursor: cursor the associated database
     :return: None
     """
-    query = sql.SQL('DELETE FROM {} WHERE {} = %s AND WHERE {} = %s').format(
+    query = sql.SQL('DELETE FROM {} WHERE {} = %s AND {} = %s').format(
         sql.Identifier('paper_info'), sql.Identifier('arxiv_id'), sql.Identifier('keyword'))
     dbi.generic_execution(query, (arxiv_id, keyword))

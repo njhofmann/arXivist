@@ -1,4 +1,5 @@
 from typing import List, Tuple, Iterable, Dict
+import pathlib as pl
 from psycopg2 import sql
 import src.db_util as db
 import src.utility.base_query as bq
@@ -11,8 +12,8 @@ class DatabaseQuery(bq.BaseQuery):
     """Represents a query to the application's database for previously entered info"""
 
     def __init__(self, title_args: Iterable[str] = (), author_args: Iterable[str] = (),
-                 abstract_args: Iterable[str] = (), id_args: Iterable[str] = (), max_result: int = 10,
-                 start: int = 0) -> None:
+                 abstract_args: Iterable[str] = (), id_args: Iterable[str] = (),
+                 keyword_args: Iterable[str] = (), max_result: int = 10, start: int = 0) -> None:
         """Creates a DatabaseQuery from the given search arguments
         :param title_args: arguments to search for in papers's titles
         :param author_args: arguments to search for in papers's authors
@@ -22,8 +23,11 @@ class DatabaseQuery(bq.BaseQuery):
         :param start: page to start searching on
         :return: None
         """
-        super().__init__(title_params=title_args, author_params=author_args, abstract_params=abstract_args,
-                         id_params=id_args, max_result=max_result, start=start)
+        super().__init__(title_args=title_args, author_args=author_args, abstract_args=abstract_args,
+                         id_args=id_args, max_result=max_result, start=start)
+        if not keyword_args:
+            raise ValueError('must be given one or more args')
+        self.keyword_args = keyword_args
 
     @staticmethod
     def format_params(params: Iterable[str]) -> str:
@@ -37,8 +41,8 @@ class DatabaseQuery(bq.BaseQuery):
         return [sql.Identifier(table, column) for _ in range(n)]
 
     def as_sql_query(self):
-        cols_to_params = {'arvix_id': self.id_params, 'abstract': self.abstract_params, 'title': self.title_params,
-                          'author': self.author_params}
+        cols_to_params = {'arvix_id': self.id_args, 'abstract': self.abstract_args, 'title': self.title_args,
+                          'author': self.author_args}
 
         col_to_formatted_params = {col: self.format_params(params) for col, params in cols_to_params.items()}
         columns_to_identifiers = {}
@@ -74,8 +78,9 @@ class DatabaseQuery(bq.BaseQuery):
             if arxiv_id in search_results:
                 search_results.get(arxiv_id).add_author(author)
             else:
-                search_results[arxiv_id] = sr.SearchResult(title=title, pdf_path=pdf_path, abstract=abstract,
-                                                           authors=[author], id=arxiv_id)
+                search_results[arxiv_id] = sr.SearchResult(title=title, pdf_path=pl.Path(pdf_path), abstract=abstract,
+                                                           authors=[author], id=arxiv_id, keywords=set())
+                # TODO retrieve keywords
         return list(search_results.values())
 
     def get_results(self) -> List[Tuple[int, sr.SearchResult]]:
@@ -91,6 +96,30 @@ class DatabaseQuery(bq.BaseQuery):
             gen_results = search_results[count:count + self.max_result]
             yield [(count + idx, result) for idx, result in enumerate(gen_results)]
             count += self.max_result
+
+    @classmethod
+    def get_parser(cls) -> bq.RaisingArgParser:
+        """Returns an ArgumentParser for creating a ViewQuery
+        :return: custom ArgumentParser
+        """
+        parser = super().get_parser()
+        parser.add_argument('-k', '--keyword', nargs='*', type=str, default=[],
+                            help='search by keywords added to papers')
+        return parser
+
+    @classmethod
+    def from_args(cls: type, args: List[str]):
+        """Given a list of arguments, creates an instance of this DatabaseQuery (or subclass)
+        :param cls: the type of the class being created (BaseQuery of subclass)
+        :param args: list of arguments to create the class from
+        :return: instantiated class of given type"""
+        parser = cls.get_parser()
+        args = parser.parse_args(args)
+        return cls(title_args=args.title + args.all,
+                   id_args=args.arvix_id + args.all,
+                   abstract_args=args.abstract + args.all,
+                   author_args=args.author + args.all,
+                   keyword_args=args.keyword + args.all)
 
 
 def get_suggested_papers_from_db(cursor) -> List[str]:

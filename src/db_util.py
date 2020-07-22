@@ -67,4 +67,4 @@ def init_db(schema_file: Union[str, pl.Path]) -> None:
 
 
 if __name__ == '__main__':
-    init_db('init.sql')
+    init_db('schema.sql')

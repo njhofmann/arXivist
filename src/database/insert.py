@@ -1,8 +1,6 @@
 import pathlib as pl
-from typing import Dict, List
-
+from typing import Dict, List, Iterable
 from psycopg2 import sql
-
 import src.utility.search_result as u
 
 """Module containing functionality for inserting data into the database"""
@@ -46,7 +44,7 @@ def insert_citations(cursor, paper_id: str, refs: List[str]) -> None:
         execute_insertion(cursor, 'citation_graph', cols_to_values)
 
 
-def insert_keywords(cursor, paper_id: str, keywords: List[str]) -> None:
+def insert_keywords(cursor, paper_id: str, keywords: Iterable[str]) -> None:
     for keyword in keywords:
         cols_to_values = {'arxiv_id': paper_id, 'keyword': keyword}
         execute_insertion(cursor, 'paper_keyword', cols_to_values)

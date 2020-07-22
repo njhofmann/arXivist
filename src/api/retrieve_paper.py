@@ -113,7 +113,7 @@ class SearchQuery(bq.BaseQuery):
             authors = [self.get_atom_child(author, 'name').text for author in self.get_atom_children(entry, 'author')]
 
             parsed_entries.append(sr.SearchResult(title=title, id=arxiv_id, abstract=abstract, authors=authors,
-                                                  pdf_url=pdf_link, publish=date, keywords=[]))
+                                                  pdf_url=pdf_link, publish=date, keywords=set()))
         return parsed_entries
 
     def parse_error(self, error_msg: str):

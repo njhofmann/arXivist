@@ -20,9 +20,6 @@ class BaseQuery(abc.ABC):
     def __init__(self, title_args: Iterable[str] = (), author_args: Iterable[str] = (),
                  abstract_args: Iterable[str] = (), id_args: Iterable[str] = (),
                  max_result: int = 10, start: int = 0) -> None:
-        if not any([title_args, author_args, abstract_args, id_args]):
-            raise ValueError('must be given one or more args')
-
         self.title_args = title_args
         self.author_args = author_args
         self.abstract_args = abstract_args
@@ -30,12 +27,12 @@ class BaseQuery(abc.ABC):
         self.max_result = max_result
         self.start = start
 
-    @staticmethod
-    def get_parser() -> RaisingArgParser:
+
+    @classmethod
+    def get_parser(cls) -> RaisingArgParser:
         """Returns an ArgumentParser for creating a BaseQuery
         :return: custom ArgumentParser
         """
-        # TODO search by keyword..?
         parser = RaisingArgParser(prefix_chars='-', description='parse paper search arguments')
         parser.add_argument('-a', '--all', nargs='*', type=str, default=[], help='apply argument to every other arg')
         parser.add_argument('-id', '--arvix_id', nargs='*', type=str, default=[], help='search by arxiv id')
@@ -50,7 +47,7 @@ class BaseQuery(abc.ABC):
         :param cls: the type of the class being created (BaseQuery of subclass)
         :param args: list of arguments to create the class from
         :return: instantiated class of given type"""
-        parser = BaseQuery.get_parser()
+        parser = cls.get_parser()
         args = parser.parse_args(args)
         return cls(title_args=args.title + args.all,
                    id_args=args.arvix_id + args.all,

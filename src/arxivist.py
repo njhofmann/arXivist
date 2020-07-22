@@ -29,7 +29,7 @@ def load_env_file(env_path: pl.Path) -> None:
 
 
 ENV_FILE = pl.Path('.env')
-SCHEMA_FILE = pl.Path(__file__).parent.parent.joinpath('init.sql')
+SCHEMA_FILE = pl.Path(__file__).parent.parent.joinpath('schema.sql')
 
 
 class UserOptions(ce.CmdEnum):

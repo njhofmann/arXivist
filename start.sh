@@ -26,7 +26,11 @@ elif [ $# -eq 0 ]; then
   docker-compose start > $LOG_FILE
 fi
 
-reset
+# clear if production mode
+if [ $PROGRAM_MODE = prod ]; then
+  reset
+fi
+
 echo "entering arXivist"
 docker exec -it $(docker-compose ps -q app) python -m src.arxivist $PROGRAM_MODE
 

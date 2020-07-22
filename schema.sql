@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS paper_author (
 );
 
 CREATE TABLE IF NOT EXISTS paper_keyword (
-    arvix_id TEXT,
+    arxiv_id TEXT,
     keyword TEXT,
-    PRIMARY KEY (arvix_id, keyword),
-    FOREIGN KEY (arvix_id) REFERENCES paper_info(arxiv_id) ON DELETE CASCADE
+    PRIMARY KEY (arxiv_id, keyword),
+    FOREIGN KEY (arxiv_id) REFERENCES paper_info(arxiv_id) ON DELETE CASCADE
 );

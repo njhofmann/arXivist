@@ -1,9 +1,9 @@
 from __future__ import annotations
-
-from typing import List
-
+from typing import List, Iterable
 import src.database.remove as rm
 import src.database.retrieve as dbr
+import src.database.insert as dbi
+import src.db_util as dbu
 import src.pdf_utils as pu
 import src.utility.cmd_enum as ce
 import src.utility.save_query as sq
@@ -50,7 +50,19 @@ def del_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
 
 def key_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
     # TODO finish me
-    print('not implemented yet')
+    if len(args) < 2:
+        raise ValueError('need at least a paper id and one keyword')
+    paper_id = int(args[0])
+    keywords = args[1:]
+    dbu.generic_db_query(dbi.insert_keywords, paper_id, keywords)
+
+
+def rmv_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
+    if len(args) != 2:
+        raise ValueError('need a paper id and a keyword')
+    paper_id = int(args[0])
+    rm.remove_keyword(save_query.valid_ids_to_info[paper_id].id, args[1])
+
 
 
 class UserViewModes(ce.CmdEnum):
@@ -61,6 +73,7 @@ class UserViewModes(ce.CmdEnum):
     HELP = ce.Command('help', help_cmd_func, 'view what each option does')
     DEL = ce.Command('del', del_cmd_func, 'removes paper and associated data')
     KEY = ce.Command('key', key_cmd_func, 'for adding a keyword to a retrieved paper')
+    RMV = ce.Command('rmv', rmv_cmd_func, 'for removing a keyword from a retrieved paper')
 
     @classmethod
     def execute_params(cls, params: List[str], save_query: sq.SaveQuery = None) -> UserViewModes:

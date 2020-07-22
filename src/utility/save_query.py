@@ -29,10 +29,10 @@ class SaveQuery:
             raise ValueError(f'{param} not in list of valid ids')
         self.selected_ids.add(param)
 
-    def add_keywords(self, result_id: int, keywords: str) -> None:
+    def add_keywords(self, result_id: int, keywords: Set[str]) -> None:
         if result_id not in self.selected_ids:
             raise ValueError('invalid added paper id')
-        self.valid_ids_to_info[result_id].keywords += keywords
+        self.valid_ids_to_info[result_id].keywords.update(set(keywords))
 
     def is_valid_id(self, result_id: int) -> bool:
         return result_id in self.valid_ids_to_info
