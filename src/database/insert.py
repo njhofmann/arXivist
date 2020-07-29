@@ -1,6 +1,8 @@
 import pathlib as pl
 from typing import Dict, List, Iterable
+
 from psycopg2 import sql
+
 import src.utility.search_result as u
 
 """Module containing functionality for inserting data into the database"""

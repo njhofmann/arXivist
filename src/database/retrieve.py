@@ -1,6 +1,8 @@
-from typing import List, Tuple, Iterable, Dict
 import pathlib as pl
+from typing import List, Tuple, Iterable, Dict
+
 from psycopg2 import sql
+
 import src.db_util as db
 import src.utility.base_query as bq
 import src.utility.search_result as sr

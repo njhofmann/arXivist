@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 import abc
 import dataclasses as dc
 import enum as e
 from typing import Any, List, Callable
+
 import src.utility.save_query as sq
 
 

@@ -27,7 +27,6 @@ class BaseQuery(abc.ABC):
         self.max_result = max_result
         self.start = start
 
-
     @classmethod
     def get_parser(cls) -> RaisingArgParser:
         """Returns an ArgumentParser for creating a BaseQuery

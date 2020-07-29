@@ -1,4 +1,5 @@
 from psycopg2 import sql
+
 import src.db_util as dbi
 
 """Module containing functionalities relating to remove data from the database"""

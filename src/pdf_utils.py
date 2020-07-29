@@ -1,10 +1,12 @@
+import os
 import pathlib as pl
 import subprocess as sbp
 import sys
 import uuid
 from typing import Union
+
 import requests as r
-import os
+
 import src.utility.search_result as u
 
 BASE_ARXIV_PDF_URL = 'http://arxiv.org/pdf/'

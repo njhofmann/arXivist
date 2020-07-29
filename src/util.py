@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Tuple, Callable
+import src.utility.search_result as sr
 
 
 def get_formatted_user_input(msg: str = '') -> List[str]:
@@ -37,3 +38,10 @@ def is_list_of_n_ints(to_parse: List[str], n: int = -1) -> List[int]:
     elif -1 < n != len(to_parse):  # -1 means variable length
         raise ValueError(f'given list {to_parse} must have only {n} entries')
     return [int(item) for item in to_parse]
+
+
+def create_result_display_func(responses: List[Tuple[int, sr.SearchResult]]) -> Callable:
+    def print_results():
+        for result_id, response in responses:
+            print(result_id, response.title)
+    return print_results

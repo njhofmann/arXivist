@@ -1,8 +1,10 @@
 import itertools as i
-import requests as r
-from typing import Iterable, List, Tuple, Generator
 import xml.etree as xe
 import xml.etree.ElementTree as xee
+from typing import Iterable, List, Tuple, Generator
+
+import requests as r
+
 import src.utility.base_query as bq
 import src.utility.search_result as sr
 
@@ -55,7 +57,7 @@ class SearchQuery(bq.BaseQuery):
     def get_xml_tree(self, text: str) -> xe.ElementTree:
         return xe.ElementTree.fromstring(text)
 
-    def retrieve_search_results(self) -> Generator[Tuple[int, sr.SearchResult], None, None]:
+    def retrieve_search_results(self) -> Generator[List[Tuple[int, sr.SearchResult]], None, None]:
         response = self.get_response_with_starting_query()
         if response.ok:  # ok, begin recursive parsing
             root = self.get_xml_tree(response.text)
@@ -63,7 +65,8 @@ class SearchQuery(bq.BaseQuery):
             return self.retrieve_valid_search_results(self.start, self.max_result, total_results)
         return self.parse_error(response.text)
 
-    def retrieve_valid_search_results(self, start: int, space: int, end: int) -> Generator[Tuple[int, sr.SearchResult], None, None]:
+    def retrieve_valid_search_results(self, start: int, space: int, end: int) \
+            -> Generator[List[Tuple[int, sr.SearchResult]], None, None]:
         count = 0
         while True:
             search_results = self.parse_valid_response(self.get_response_with_limited_query(start, space).text)

@@ -1,13 +1,15 @@
 from __future__ import annotations
-from typing import List, Iterable
+
+from typing import List
+
+import src.database.insert as dbi
 import src.database.remove as rm
 import src.database.retrieve as dbr
-import src.database.insert as dbi
 import src.db_util as dbu
 import src.pdf_utils as pu
+import src.util as u
 import src.utility.cmd_enum as ce
 import src.utility.save_query as sq
-import src.util as u
 
 """Mode for viewing, removing, or editing previously saved entries."""
 
@@ -64,7 +66,6 @@ def rmv_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
     rm.remove_keyword(save_query.valid_ids_to_info[paper_id].id, args[1])
 
 
-
 class UserViewModes(ce.CmdEnum):
     QUIT = ce.Command('quit', quit_cmd_func, 'quit the mode')
     CONT = ce.Command('cont', cont_cmd_func, 'continue viewing more search results')
@@ -81,18 +82,16 @@ class UserViewModes(ce.CmdEnum):
 
 
 def view_mode():
-    search_params = u.split_and_format_string(input('enter search params\n'))
+    print('view mode entered\n')
+    search_params = u.get_formatted_user_input('enter search params')
     db_query = dbr.DatabaseQuery.from_args(search_params)
     results = db_query.get_results()
     save_query = sq.SaveQuery()
 
     time_to_quit = False
     for response in results:
-        for idx, result in response:
-            save_query.add_valid_id(idx, result)
-            print(idx, result.title)
-
-        print('view mode entered\n')
+        response_print_func = u.create_result_display_func(response)
+        response_print_func()
 
         while True:
             results_response = u.get_formatted_user_input('waiting...')

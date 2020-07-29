@@ -2,6 +2,7 @@ import dataclasses as dc
 import os
 import pathlib as pl
 from typing import Union, Callable, Any, Optional, Tuple
+
 import psycopg2 as psy
 from psycopg2 import sql
 

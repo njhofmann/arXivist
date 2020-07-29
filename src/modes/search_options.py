@@ -1,8 +1,11 @@
 from __future__ import annotations
-from typing import List
+
+from typing import List, Callable, Generator, Tuple
+
+import src.util as u
 import src.utility.cmd_enum as ce
 import src.utility.save_query as sq
-import src.util as u
+import src.utility.search_result as sr
 
 
 def more_cmd_func(args: List[str], save_query: sq.SaveQuery) -> None:
@@ -64,3 +67,31 @@ class UserSearchOptions(ce.CmdEnum):
     @classmethod
     def execute_params(cls, args: List[str], save_query: sq.SaveQuery = None) -> UserSearchOptions:
         return UserSearchOptions(super().execute_params_with_checks(args, save_query))
+
+
+def generic_search_mode(retrieval_func: Callable[[], Generator[List[Tuple[int, sr.SearchResult]], None, None]]):
+    save_query = sq.SaveQuery()
+    for responses in retrieval_func():
+        time_to_quit = False
+        responses_print_func = u.create_result_display_func(responses)
+        for result_id, response in responses:
+            save_query.add_valid_id(result_id, response)
+
+        responses_print_func()
+
+        while True:
+            UserSearchOptions.display_available_options()
+            results_response = u.get_formatted_user_input()
+            cmd = UserSearchOptions.execute_params(results_response, save_query)
+
+            if cmd == UserSearchOptions.CONT:
+                break
+            elif cmd == UserSearchOptions.QUIT:
+                time_to_quit = True
+                break
+            elif cmd == UserSearchOptions.DISP:
+                responses_print_func()
+
+        if time_to_quit:
+            break
+
