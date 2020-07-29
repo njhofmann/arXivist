@@ -13,10 +13,14 @@ if [ $# -gt 1 ]; then
 fi
 
 if [ $# -eq 1 ]; then
-  if [ $1 = "update" ]; then
+  if [ $1 = "build" ]; then
     echo "rebuilding arXivist"
     docker-compose down
     docker-compose up --build -d --force --quiet > $LOG_FILE
+  elif [ $# = "update"]
+    echo "attempting to update from remote"
+    git pull origin master
+    docker-compose build -q
   else
     echo "invalid single parameter"
     exit 1
