@@ -1,6 +1,7 @@
 import abc
 import argparse as ap
 from typing import Iterable, List
+import src.util as u
 
 
 class ArgumentParserException(Exception):
@@ -29,7 +30,7 @@ class BaseQuery(abc.ABC):
 
     @classmethod
     def get_parser(cls) -> RaisingArgParser:
-        """Returns an ArgumentParser for creating a BaseQuery
+        """Returns an RaisingArgParser for creating a BaseQuery
         :return: custom ArgumentParser
         """
         parser = RaisingArgParser(prefix_chars='-', description='parse paper search arguments')
@@ -41,14 +42,19 @@ class BaseQuery(abc.ABC):
         return parser
 
     @classmethod
-    def from_args(cls: type, args: List[str]):
-        """Given a list of arguments, creates an instance of this BaseQuery (or subclass)
+    def from_args(cls: type):
+        """Asks the user for a list of arguments, creating an instance of this BaseQuery (or subclass) from them.
         :param cls: the type of the class being created (BaseQuery of subclass)
         :param args: list of arguments to create the class from
         :return: instantiated class of given type"""
         parser = cls.get_parser()
-        args = parser.parse_args(args)
-        return cls(title_args=args.title + args.all,
-                   id_args=args.arvix_id + args.all,
-                   abstract_args=args.abstract + args.all,
-                   author_args=args.author + args.all)
+        while True:
+            try:
+                args = u.get_formatted_user_input('enter search params')
+                args = parser.parse_args(args)
+                return cls(title_args=args.title + args.all,
+                           id_args=args.arvix_id + args.all,
+                           abstract_args=args.abstract + args.all,
+                           author_args=args.author + args.all)
+            except ArgumentParserException as e:
+                print(e)

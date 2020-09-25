@@ -10,9 +10,9 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     restart: always
     expose:
-      - "5432"
+      - ${POSTGRES_PORT}
     ports:
-      - "5432:5432"
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
 #    volumes:
 #    - postgres_volume:/var/lib/postgresql/data
 

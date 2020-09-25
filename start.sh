@@ -17,7 +17,7 @@ if [ $# -eq 1 ]; then
     echo "rebuilding arXivist"
     docker-compose down
     docker-compose up --build -d --force --quiet > $LOG_FILE
-  elif [ $# = "update"]
+  elif [ $# = "update"]; then
     echo "attempting to update from remote"
     git pull origin master
     docker-compose build -q
