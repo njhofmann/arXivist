@@ -72,5 +72,5 @@ def main(sys_mode: str) -> None:
 if __name__ == '__main__':
     user_args = sys.argv[1:]
     if len(user_args) != 1:
-        raise ValueError('require only one argument to select mode shell runs in')
+        raise ValueError(f'args {user_args}: require only one argument to select mode shell runs in')
     main(user_args[0])

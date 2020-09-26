@@ -82,9 +82,8 @@ class UserViewModes(ce.CmdEnum):
 
 
 def view_mode():
-    print('view mode entered\n')
-    search_params = u.get_formatted_user_input('enter search params')
-    db_query = dbr.DatabaseQuery.from_args(search_params)
+    print('view mode entered')
+    db_query = dbr.DatabaseQuery.from_args()
     results = db_query.get_results()
     save_query = sq.SaveQuery()
 

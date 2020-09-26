@@ -1,4 +1,5 @@
 from typing import List, Tuple, Callable
+
 import src.utility.search_result as sr
 
 

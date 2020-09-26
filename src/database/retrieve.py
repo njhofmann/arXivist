@@ -1,3 +1,4 @@
+import argparse as ap
 import pathlib as pl
 from typing import List, Tuple, Iterable, Dict
 
@@ -100,7 +101,7 @@ class DatabaseQuery(bq.BaseQuery):
             count += self.max_result
 
     @classmethod
-    def get_parser(cls) -> bq.RaisingArgParser:
+    def get_parser(cls) -> bq.RaisingArgumentParser:
         """Returns an ArgumentParser for creating a ViewQuery
         :return: custom ArgumentParser
         """
@@ -109,19 +110,24 @@ class DatabaseQuery(bq.BaseQuery):
                             help='search by keywords added to papers')
         return parser
 
-    @classmethod
-    def from_args(cls: type, args: List[str]):
-        """Given a list of arguments, creates an instance of this DatabaseQuery (or subclass)
-        :param cls: the type of the class being created (BaseQuery of subclass)
-        :param args: list of arguments to create the class from
-        :return: instantiated class of given type"""
-        parser = cls.get_parser()
-        args = parser.parse_args(args)
-        return cls(title_args=args.title + args.all,
-                   id_args=args.arvix_id + args.all,
-                   abstract_args=args.abstract + args.all,
-                   author_args=args.author + args.all,
-                   keyword_args=args.keyword + args.all)
+    @staticmethod
+    def create_search_args(args: ap.Namespace) -> dict:
+        return {**super(DatabaseQuery, DatabaseQuery).create_search_args(args),
+                'keyword_args': args.keyword + args.all}
+
+    # @classmethod
+    # def from_args(cls: type):
+    #     """Given a list of arguments, creates an instance of this DatabaseQuery (or subclass)
+    #     :param cls: the type of the class being created (BaseQuery of subclass)
+    #     :param args: list of arguments to create the class from
+    #     :return: instantiated class of given type"""
+    #     parser = cls.get_parser()
+    #     args = parser.parse_args(args)
+    #     return cls(title_args=args.title + args.all,
+    #                id_args=args.arvix_id + args.all,
+    #                abstract_args=args.abstract + args.all,
+    #                author_args=args.author + args.all,
+    #                keyword_args=args.keyword + args.all)
 
 
 def get_suggested_papers_from_db(cursor) -> List[str]:
