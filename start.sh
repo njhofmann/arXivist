@@ -2,6 +2,9 @@
 
 LOG_FILE="output.log"
 
+# set working directory to this script's directory so docker will read docker files
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
 # load env file
 set -o allexport
 source ./.env

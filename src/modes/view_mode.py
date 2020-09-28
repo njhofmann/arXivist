@@ -70,7 +70,7 @@ class UserViewModes(ce.CmdEnum):
     QUIT = ce.Command('quit', quit_cmd_func, 'quit the mode')
     CONT = ce.Command('cont', cont_cmd_func, 'continue viewing more search results')
     MORE = ce.Command('more', more_cmd_func, 'view summary info about a selected pdf')
-    OPEN = ce.Command('open', open_cmd_func, 'open a file for viewing')
+    #OPEN = ce.Command('open', open_cmd_func, 'open a file for viewing')
     HELP = ce.Command('help', help_cmd_func, 'view what each option does')
     DEL = ce.Command('del', del_cmd_func, 'removes paper and associated data')
     KEY = ce.Command('key', key_cmd_func, 'for adding a keyword to a retrieved paper')

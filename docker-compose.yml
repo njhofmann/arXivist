@@ -13,8 +13,8 @@ services:
       - ${POSTGRES_PORT}
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
-#    volumes:
-#    - postgres_volume:/var/lib/postgresql/data
+    volumes:
+    - postgres_volume:/var/lib/postgresql/data
 
   app:
     stdin_open: true
