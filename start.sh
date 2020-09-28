@@ -47,4 +47,5 @@ docker-compose stop >> $LOG_FILE &
 # clear if production mode
 if [ $PROGRAM_MODE = prod ]; then
   reset
+  reset
 fi

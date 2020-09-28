@@ -72,7 +72,7 @@ class BaseQuery(abc.ABC):
                 args = u.get_formatted_user_input('enter search params')
                 args = parser.parse_args(args)
                 print('fetching results...')
-                return cls(cls.create_search_args(args))
+                return cls(**cls.create_search_args(args))
             except ArgumentParserException as e:  # invalid args, try again than error out
                 print(e)
             except SystemExit:  # if help requested, don't system exit

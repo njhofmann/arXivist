@@ -36,7 +36,7 @@ def is_list_of_n_ints(to_parse: List[str], n: int = -1) -> List[int]:
     """
     if not to_parse:
         return []
-    elif -1 < n != len(to_parse):  # -1 means variable length
+    elif -1 < n and n != len(to_parse):  # -1 means variable length
         raise ValueError(f'given list {to_parse} must have only {n} entries')
     return [int(item) for item in to_parse]
 
