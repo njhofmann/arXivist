@@ -14,6 +14,8 @@ import src.util as u
 import src.utility.cmd_enum as ce
 import src.utility.save_query as sq
 
+from cliche import cli
+
 """Main entry point for the arXivist shell. Displays set of supported "modes" (search, viewing, suggestion, etc.) user
 can select from."""
 
@@ -50,7 +52,8 @@ class UserOptions(ce.CmdEnum):
         return UserOptions(super().execute_params_with_checks(args, search_query, [valid_size]))
 
 
-def main(sys_mode: str) -> None:
+@cli
+def run(sys_mode: str) -> None:
     if sys_mode not in ('prod', 'dev'):
         raise ValueError(f'{sys_mode} is an unsupported system mode')
 
@@ -67,10 +70,3 @@ def main(sys_mode: str) -> None:
             if sys_mode != 'prod':
                 raise e
             print(e)
-
-
-if __name__ == '__main__':
-    user_args = sys.argv[1:]
-    if len(user_args) != 1:
-        raise ValueError(f'args {user_args}: require only one argument to select mode shell runs in')
-    main(user_args[0])
