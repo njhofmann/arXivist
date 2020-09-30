@@ -2,7 +2,6 @@ import os
 import pathlib as pl
 import subprocess as sbp
 import sys
-import uuid
 from typing import Union
 
 import requests as r
@@ -17,12 +16,12 @@ def get_pdf_folder_path() -> pl.Path:
 
 
 def fetch_and_save_pdf(pdf_url: u.SearchResult) -> pl.Path:
-    file_name = str(uuid.uuid4()) + '.pdf'
-    pdf_url = BASE_ARXIV_PDF_URL + pdf_url.id + '.pdf'
-    full_path = get_pdf_folder_path().joinpath(file_name).resolve()
-    response = r.get(pdf_url, stream=True)
+    new_pdf_url = BASE_ARXIV_PDF_URL + pdf_url.id + '.pdf'
+    full_path = get_pdf_folder_path().joinpath(f'{pdf_url.title}.pdf').resolve()
+    response = r.get(new_pdf_url, stream=True)
     response.raw.decode_content = True
     with open(full_path, 'wb') as file:
+        os.chmod(full_path, 0o777)
         file.write(response.content)
     return full_path
 
